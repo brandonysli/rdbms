@@ -3,3 +3,4 @@
 ## Team Members
 
 - Brandon Li
+- Edward Duan
