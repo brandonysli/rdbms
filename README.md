@@ -3,4 +3,4 @@
 ## Team Members
 
 - Brandon Li
-- Edward Duan
+- Edward Duan (ewd24)
