@@ -22,7 +22,7 @@ type column = Distinct of string list | Nondistinct of string list
 type selection = Count of column | Column of column
 
 type query = {
-  columns : selection;
+  selection : selection;
   table : table;
   condition : condition option;
 }

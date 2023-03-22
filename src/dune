@@ -1,2 +1,4 @@
 (library
- (name base))
+ (name base)
+ (public_name Base)
+ (libraries str))

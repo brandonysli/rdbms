@@ -1,3 +1,5 @@
+open Str
+
 type object_phrase = string list
 
 exception Empty
@@ -13,7 +15,7 @@ type column = Distinct of string list | Nondistinct of string list
 type selection = Count of column | Column of column
 
 type query = {
-  columns : selection;
+  selection : selection;
   table : table;
   condition : condition option;
 }
@@ -23,8 +25,10 @@ let rec get_input list_head list_tail =
   | [] -> (list_head, [])
   | head :: tail ->
       let s = String.lowercase_ascii head in
-      if s = "select" || s = "count" || s = "from" || s = "where" then
-        (list_head, list_tail)
+      if
+        s = "select" || s = "count" || s = "from" || s = "where" || s = ">"
+        || s = "<" || s = "="
+      then (list_head, list_tail)
       else get_input (list_head @ [ head ]) tail
 
 let get_columns lst =
@@ -33,10 +37,12 @@ let get_columns lst =
   | head :: tail ->
       if String.lowercase_ascii head = "distinct" then
         let h, t = get_input [] tail in
-        (Distinct h, t)
+        let lst = Str.split (Str.regexp ", ") (String.concat " " h) in
+        (Distinct lst, t)
       else
         let h, t = get_input [] lst in
-        (Nondistinct h, t)
+        let lst = Str.split (Str.regexp ", ") (String.concat " " h) in
+        (Nondistinct lst, t)
 
 let parse_selection lst =
   match lst with
@@ -50,7 +56,7 @@ let parse_selection lst =
               let h, t = get_columns tail2 in
               (Count h, t)
             else
-              let h, t = get_columns tail2 in
+              let h, t = get_columns tail in
               (Column h, t)
       else raise Malformed
 
@@ -77,16 +83,16 @@ let parse_condition lst =
         let data, t = get_input [] tail in
         match t with
         | [] -> raise Malformed
-        | head :: tail -> (
-            match head with
+        | head2 :: tail2 -> (
+            match head2 with
             | ">" ->
-                let i = get_int tail in
+                let i = get_int tail2 in
                 Some (Greater (String.concat " " data, i))
             | "<" ->
-                let i = get_int tail in
+                let i = get_int tail2 in
                 Some (Less (String.concat " " data, i))
             | "=" ->
-                let i = get_int tail in
+                let i = get_int tail2 in
                 Some (Equal (String.concat " " data, i))
             | _ -> raise Malformed)
       else raise Malformed
@@ -96,4 +102,4 @@ let parse str =
   let selection, next = parse_selection lst in
   let table, next2 = parse_table next in
   let cond = parse_condition next2 in
-  { columns = selection; table; condition = cond }
+  { selection; table; condition = cond }
