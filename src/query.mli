@@ -17,12 +17,13 @@ type condition =
   | Less of (string * int)
   | Equal of (string * int)
 
+type table = From of string
 type column = Distinct of string list | Nondistinct of string list
 type selection = Count of column | Column of column
 
 type query = {
   columns : selection;
-  table : string;
+  table : table;
   condition : condition option;
 }
 
