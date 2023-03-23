@@ -126,7 +126,7 @@ type data =
   | Bool of bool
   | String of string
 
-type column = {
+type columns = {
   name : string;
   data : data;
 }
@@ -134,25 +134,24 @@ type column = {
 type creation =
   | Table of {
       table_name : string;
-      columns : column list;
+      columns : columns list;
     }
   | Database of string
 
-let parse_data str =
-  if Str.string_match (Str.regexp "int\((?:\d{1,3})?\)") str 0 then Int 255
-  else if Str.string_match (Str.regexp "float\((?:\d{1,3})?\)") str 0 then
-    Float 255.
-  else if Str.string_match (Str.regexp "bool\((?:\d{1,3})?\)") str 0 then
-    Bool true
-  else if Str.string_match (Str.regexp "string\((?:\d{1,3})?\)") str 0 then
-    String "hi"
-  else raise Malformed
+let parse_data str = raise
+
+exception Unimplemented
+(*if Str.string_match (Str.regexp "int\((?:\d{1,3})?\)") str 0 then Int 255 else
+  if Str.string_match (Str.regexp "float\((?:\d{1,3})?\)") str 0 then Float 255.
+  else if Str.string_match (Str.regexp "bool\((?:\d{1,3})?\)") str 0 then Bool
+  true else if Str.string_match (Str.regexp "string\((?:\d{1,3})?\)") str 0 then
+  String "hi" else raise Malformed*)
 
 let parse_tables lst =
   let csv = lst |> String.concat " " |> Str.split (Str.regexp ", ") in
   match csv with
   | [] -> raise Malformed
-  | [ name; data ] -> { name; data = parse_data data }
+  | [ name; data ] -> { name; data = Int 1 }
   | head :: tail -> raise Malformed
 
 let parse_table_creation lst =

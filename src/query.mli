@@ -42,7 +42,7 @@ type data =
   | Bool of bool
   | String of string
 
-type column = {
+type columns = {
   name : string;
   data : data;
 }
@@ -50,7 +50,7 @@ type column = {
 type creation =
   | Table of {
       table_name : string;
-      columns : column list;
+      columns : columns list;
     }
   | Database of string
 
