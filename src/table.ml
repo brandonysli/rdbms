@@ -66,7 +66,7 @@ let update_data tbl r attr dat =
 let delete_rec tbl r = raise (Failure "Unimplemented: Table.delete_rec")
 
 let get_record tbl attr dat =
-  tbl.records |> List.filter (fun r -> r |> List.assoc attr = dat) |> List.hd
+  tbl.records |> List.filter (fun r -> r |> List.assoc attr = Some dat) |> List.hd
 
 let get_data tbl r attr =
   tbl.records |> List.find (fun x -> x = r) |> List.assoc attr
