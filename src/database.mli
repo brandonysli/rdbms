@@ -9,7 +9,8 @@ type table = {
 
 type database = {
   db_name: string;
+  db_owner: string;
   tables: table list;
 }
 
-val pretty_print : database list -> unit
+val pp_databases : database list -> unit
