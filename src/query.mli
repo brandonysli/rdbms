@@ -18,8 +18,14 @@ type condition =
   | Equal of (string * int)
 
 type table = From of string
-type column = Distinct of string list | Nondistinct of string list
-type selection = Count of column | Column of column
+
+type column =
+  | Distinct of string list
+  | Nondistinct of string list
+
+type selection =
+  | Count of column
+  | Column of column
 
 type query = {
   selection : selection;
@@ -27,5 +33,25 @@ type query = {
   condition : condition option;
 }
 
-val parse : string -> query
+val parse_query : string -> query
 (** [parse str] parses a users's input into a [query] *)
+
+type data =
+  | Int of int
+  | Float of float
+  | Bool of bool
+  | String of string
+
+type columns = {
+  name : string;
+  data : data;
+}
+
+type creation =
+  | Table of {
+      table_name : string;
+      columns : columns list;
+    }
+  | Database of string
+
+val parse_def : string -> creation

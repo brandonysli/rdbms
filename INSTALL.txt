@@ -1,0 +1,4 @@
+In order to run the project, first build the project with
+- dune build
+and then run the project with
+- make print
