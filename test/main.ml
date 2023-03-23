@@ -14,7 +14,9 @@ let selection_to_string s =
   | Count column -> "Count " ^ column_to_string column
   | Column column -> "Column " ^ column_to_string column
 
-let table_to_string t = match t with From table -> " FROM " ^ table
+let table_to_string t =
+  match t with
+  | From table -> " FROM " ^ table
 
 let condition_to_string c =
   match c with
@@ -23,7 +25,9 @@ let condition_to_string c =
   | Equal (str, i) -> str ^ " = " ^ string_of_int i
 
 let condition_option_to_string c =
-  match c with None -> "" | Some c -> " WHERE " ^ condition_to_string c
+  match c with
+  | None -> ""
+  | Some c -> " WHERE " ^ condition_to_string c
 
 let query_to_string q =
   selection_to_string q.selection
@@ -32,7 +36,7 @@ let query_to_string q =
 
 let query_test (name : string) (str : string) (expected_output : query) : test =
   name >:: fun _ ->
-  assert_equal expected_output (parse str) ~printer:query_to_string
+  assert_equal expected_output (parse_query str) ~printer:query_to_string
 
 let command_tests =
   [

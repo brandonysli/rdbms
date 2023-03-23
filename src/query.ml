@@ -5,14 +5,25 @@ type object_phrase = string list
 exception Empty
 exception Malformed
 
+(*|---------------------------------------------------------------------------|
+  |-------------------------- Query Parsing Starts ---------------------------|
+  |---------------------------------------------------------------------------|
+  |---------------------------------------------------------------------------| *)
+
 type condition =
   | Greater of (string * int)
   | Less of (string * int)
   | Equal of (string * int)
 
 type table = From of string
-type column = Distinct of string list | Nondistinct of string list
-type selection = Count of column | Column of column
+
+type column =
+  | Distinct of string list
+  | Nondistinct of string list
+
+type selection =
+  | Count of column
+  | Column of column
 
 type query = {
   selection : selection;
@@ -97,9 +108,64 @@ let parse_condition lst =
             | _ -> raise Malformed)
       else raise Malformed
 
-let parse str =
+let parse_query str =
   let lst = List.filter (fun l -> l <> "") (String.split_on_char ' ' str) in
   let selection, next = parse_selection lst in
   let table, next2 = parse_table next in
   let cond = parse_condition next2 in
   { selection; table; condition = cond }
+
+(*|---------------------------------------------------------------------------|
+  |-------------------------Definition Parsing Starts-------------------------|
+  |---------------------------------------------------------------------------|
+  |---------------------------------------------------------------------------| *)
+
+type data =
+  | Int of int
+  | Float of float
+  | Bool of bool
+  | String of string
+
+type column = {
+  name : string;
+  data : data;
+}
+
+type creation =
+  | Table of {
+      table_name : string;
+      columns : column list;
+    }
+  | Database of string
+
+let parse_data str =
+  if Str.string_match (Str.regexp "int\((?:\d{1,3})?\)") str 0 then Int 255
+  else if Str.string_match (Str.regexp "float\((?:\d{1,3})?\)") str 0 then
+    Float 255.
+  else if Str.string_match (Str.regexp "bool\((?:\d{1,3})?\)") str 0 then
+    Bool true
+  else if Str.string_match (Str.regexp "string\((?:\d{1,3})?\)") str 0 then
+    String "hi"
+  else raise Malformed
+
+let parse_tables lst =
+  let csv = lst |> String.concat " " |> Str.split (Str.regexp ", ") in
+  match csv with
+  | [] -> raise Malformed
+  | [ name; data ] -> { name; data = parse_data data }
+  | head :: tail -> raise Malformed
+
+let parse_table_creation lst =
+  let table_name, next = get_input [] lst in
+  let tables = parse_tables next in
+  Table { table_name = "table"; columns = [ tables ] }
+
+let parse_def str =
+  let lst = List.filter (fun l -> l <> "") (String.split_on_char ' ' str) in
+  match lst with
+  | [] -> raise Empty
+  | head :: tail -> (
+      match String.lowercase_ascii head with
+      | "table" -> parse_table_creation tail
+      | "database" -> Database "Unimplemented"
+      | _ -> raise Malformed)
