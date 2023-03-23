@@ -6,6 +6,12 @@ type t = { attributes : string list; records : record list }
 let empty () : t = { attributes = []; records = [] }
 let make attrs : t = { attributes = attrs; records = [] }
 
+let empty_record attrs : record =
+  let rec helper (r : record) (a : string list) =
+    match a with [] -> r | h :: t -> helper ((h, None) :: r) t
+  in
+  helper [] attrs
+
 exception UnknownAttribute of string
 exception UnknownRecord of string
 
@@ -31,15 +37,42 @@ let update_attr tbl old_a new_a =
   }
 
 let delete_attr tbl attr = raise (Failure "Unimplemented: Table.delete_attr")
-let insert_rec tbl attr r = raise (Failure "Unimplemented: Table.insert_rec")
+
+let insert_rec tbl attr dat =
+  {
+    tbl with
+    records =
+      tbl.records
+      @ [
+          tbl.attributes |> empty_record
+          |> List.map (fun p -> if fst p = attr then (attr, Some dat) else p);
+        ]
+      (* append a new record with the data to the end of the records list *);
+  }
 
 let update_data tbl r attr dat =
-  raise (Failure "Unimplemented: Table.update_data")
+  {
+    tbl with
+    records =
+      tbl.records
+      |> List.map (fun x ->
+             if x = r then
+               x
+               |> List.map (fun p ->
+                      if fst p = attr then (attr, Some dat) else p)
+             else x);
+  }
 
 let delete_rec tbl r = raise (Failure "Unimplemented: Table.delete_rec")
-let get_record tbl attr dat = raise (Failure "Unimplemented: Table.get_record")
-let get_data tbl r attr = raise (Failure "Unimplemented: Table.get_data")
-let attributes tbl = raise (Failure "Unimplemented: Table.attributes")
-let records tbl = raise (Failure "Unimplemented: Table.records")
+
+let get_record tbl attr dat =
+  tbl.records |> List.filter (fun r -> r |> List.assoc attr = dat) |> List.hd
+
+let get_data tbl r attr =
+  tbl.records |> List.find (fun x -> x = r) |> List.assoc attr
+
+let attributes tbl = 
+  tbl.attributes
+let records tbl = tbl.records
 let columns tbl = tbl.attributes |> List.length
 let rows tbl = tbl.records |> List.length

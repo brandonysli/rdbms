@@ -35,8 +35,8 @@ val delete_attr : t -> string -> t
 (** [delete_attr tbl attr] removes the attribute with name [attr] from [tbl]. 
     Raises: [UnknownAttribute] if [attr] is not an attribute in [tbl]. *)
 
-val insert_rec : t -> data -> string -> t
-(** [insert_rec tbl dat attr] adds a record with data [dat] for given 
+val insert_rec : t -> string -> data -> t
+(** [insert_rec tbl attr dat] adds a record with data [dat] for given 
     attribute [attr]. *)
 
 val update_data : t -> record -> string -> data -> t
