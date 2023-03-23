@@ -1,10 +1,17 @@
 type value = Int of int | Float of float | String of string
 type row = value list
 type table = { table_name : string; rows : row list }
-type database = { db_name : string; tables : table list }
+type database = { db_name : string; db_owner : string; tables : table list }
 
-let pretty_print (databases : database list) =
-  let print_db_name db = Printf.printf "%s\n" db.db_name in
-  Printf.printf "List of Databases\n";
-  Printf.printf "=================\n";
-  List.iter print_db_name databases
+let rec db_name_list databases =
+  match databases with
+  | [] -> []
+  | h :: t -> (h.db_name, h.db_owner) :: db_name_list t
+
+let pp_databases databases =
+  Printf.printf "\n*List of Databases*";
+  Printf.printf "%-18s| %-18s\n" "\nName" "Owner";
+  Printf.printf "-----------------+-----------------\n";
+  List.iter
+    (fun (name, owner) -> Printf.printf "%-17s| %-18s\n" name owner)
+    (db_name_list databases)
