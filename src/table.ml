@@ -12,7 +12,7 @@ type t = {
   records : record list;
 }
 
-let debug = true
+let debug = false
 
 (* RI: All records have the same number of attributes and all record
    attributes are the same. All attributes are unique.*)
@@ -103,7 +103,13 @@ let insert_full_rec attr_dat tbl =
   {
     tbl with
     records =
-      attr_dat
+      (tbl.attributes
+      |> List.map (fun (x, _) -> x)
+      |> empty_record
+      |> List.map (fun p ->
+             if List.mem_assoc (fst p) attr_dat then
+               (fst p, List.assoc (fst p) attr_dat)
+             else p))
       :: tbl.records (* append to record list assuming RI holds *);
   }
   |> rep_ok
@@ -131,9 +137,7 @@ let get_record attr dat tbl =
   |> List.filter (fun r -> r |> List.assoc attr = dat)
   |> List.hd
 
-let get_data r attr tbl =
-  tbl.records |> List.find (fun x -> x = r) |> List.assoc attr
-
+let get_data attr r = List.assoc attr r
 let attributes tbl = List.map (fun (x, _) -> x) tbl.attributes
 let records tbl = tbl.records
 let columns tbl = tbl.attributes |> List.length
@@ -190,8 +194,9 @@ let pp_records
   loop "" ordered_recs
 
 let pp tbl =
+  print_endline "";
   let attrs = List.map (fun (x, _) -> x) tbl.attributes in
-  let max = 40 in
+  let max = 120 in
   if List.length attrs > 0 then
     let div = " | " in
     let div_len = String.length div in

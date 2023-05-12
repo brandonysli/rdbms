@@ -20,6 +20,8 @@ type database = {
   tables : table list;
 }
 
+let empty = { db_name = "Empty"; db_owner = "nobody"; tables = [] }
+
 let to_data (v : value) : Table.data =
   match v with
   | Int i -> Int i
@@ -42,7 +44,14 @@ let add_table name cols d =
       :: d.tables;
   }
 
-let rec is_table name table = table.table_name = name
+let rec get_table_helper name table_list =
+  match table_list with
+  | [] -> None
+  | head :: tail ->
+      if head.table_name = name then Some head
+      else get_table_helper name tail
+
+let get_table name d = get_table_helper name d.tables
 
 let rec update_tables name f tables =
   match tables with
@@ -51,6 +60,11 @@ let rec update_tables name f tables =
       | true -> f attr :: tail
       | false -> head :: update_tables name f tail)
   | [] -> []
+
+let rec to_pair_helper cols vals =
+  match (cols, vals) with
+  | h1 :: t1, h2 :: t2 -> ("" ^ h1, to_data h2) :: to_pair_helper t1 t2
+  | _ -> []
 
 let insert_into_table name cols vals d =
   {
@@ -61,7 +75,7 @@ let insert_into_table name cols vals d =
         (fun t ->
           {
             table_name = name;
-            attr = Table.insert_rec cols (to_data vals) t;
+            attr = Table.insert_full_rec (to_pair_helper cols vals) t;
           })
         d.tables;
   }
@@ -70,6 +84,16 @@ let rec db_name_list databases =
   match databases with
   | [] -> []
   | h :: t -> (h.db_name, h.db_owner) :: db_name_list t
+
+let pp_table name d =
+  print_endline ("Table: " ^ name);
+  print_endline (Table.pp (Option.get (get_table name d)).attr)
+
+let pp_database d =
+  Printf.printf "\n*List of Tables*";
+  Printf.printf "%18s" "\nName";
+  Printf.printf "\n-----------------\n";
+  List.iter (fun t -> Printf.printf "%-17s\n" t.table_name) d.tables
 
 let pp_databases databases =
   Printf.printf "\n*List of Databases*";

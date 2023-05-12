@@ -66,8 +66,8 @@ val get_record : string -> data -> t -> record
     attribute [attr]. Requires: All data for attribute [attr] in [tbl]
     is unique. *)
 
-val get_data : record -> string -> t -> data
-(** [get_data r attr tbl] gets the data from the record [r] with
+val get_data : string -> record -> data
+(** [get_data attr r tbl] gets the data from the record [r] with
     attribute [attr]. Note: May be None. *)
 
 val attributes : t -> string list
@@ -82,5 +82,8 @@ val columns : t -> int
 val rows : t -> int
 (** [rows tbl] is the number of records (rows) the table [tbl]. *)
 
+val pp_data : data -> string
+(** [pp_data data] returns the data as a string. *)
+
 val pp : t -> string
-(** [pp attrs tbl] return the table as a string. *)
+(** [pp tbl] return the table as a string. *)
