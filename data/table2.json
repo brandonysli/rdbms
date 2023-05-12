@@ -1,0 +1,102 @@
+[
+  {
+    "id": 1,
+    "firstName": "John",
+    "lastName": "Doe",
+    "age": 30,
+    "department": "Engineering",
+    "location": "San Francisco",
+    "salary": 80000,
+    "email": "john.doe@example.com"
+  },
+  {
+    "id": 2,
+    "firstName": "Jane",
+    "lastName": "Smith",
+    "age": 28,
+    "department": "Marketing",
+    "location": "New York",
+    "salary": 65000,
+    "email": "jane.smith@example.com"
+  },
+  {
+    "id": 3,
+    "firstName": "Michael",
+    "lastName": "Johnson",
+    "age": 35,
+    "department": "Sales",
+    "location": "Chicago",
+    "salary": 75000,
+    "email": "michael.johnson@example.com"
+  },
+  {
+    "id": 4,
+    "firstName": "Emily",
+    "lastName": "Brown",
+    "age": 32,
+    "department": "HR",
+    "location": "Los Angeles",
+    "salary": 70000,
+    "email": "emily.brown@example.com"
+  },
+  {
+    "id": 5,
+    "firstName": "Sarah",
+    "lastName": "Wilson",
+    "age": 26,
+    "department": "Engineering",
+    "location": "San Francisco",
+    "salary": 85000,
+    "email": "sarah.wilson@example.com"
+  },
+  {
+    "id": 6,
+    "firstName": "David",
+    "lastName": "Anderson",
+    "age": 33,
+    "department": "Sales",
+    "location": "Chicago",
+    "salary": 90000,
+    "email": "david.anderson@example.com"
+  },
+  {
+    "id": 7,
+    "firstName": "Amy",
+    "lastName": "Taylor",
+    "age": 29,
+    "department": "Marketing",
+    "location": "New York",
+    "salary": 60000,
+    "email": "amy.taylor@example.com"
+  },
+  {
+    "id": 8,
+    "firstName": "Matthew",
+    "lastName": "Walker",
+    "age": 31,
+    "department": "Engineering",
+    "location": "San Francisco",
+    "salary": 75000,
+    "email": "matthew.walker@example.com"
+  },
+  {
+    "id": 9,
+    "firstName": "Olivia",
+    "lastName": "Davis",
+    "age": 27,
+    "department": "HR",
+    "location": "Los Angeles",
+    "salary": 65000,
+    "email": "olivia.davis@example.com"
+  },
+  {
+    "id": 10,
+    "firstName": "William",
+    "lastName": "Miller",
+    "age": 34,
+    "department": "Sales",
+    "location": "Chicago",
+    "salary": 80000,
+    "email": "william.miller@example.com"
+  }
+]

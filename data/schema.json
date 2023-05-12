@@ -1,0 +1,9 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "Table",
+  "$description": "A basic table with a list of records. ",
+  "type": "array",
+  "items": {
+    "type": "object"
+  }
+}
