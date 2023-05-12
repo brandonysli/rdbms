@@ -9,12 +9,12 @@ type record
 type t
 (** Abstract type representing a table. *)
 
-val empty : unit -> t
-(** [empty ()] is a table with no attributes (columns) nor records (rows). *)
+val empty : string -> t
+(** [empty name] is a table with no attributes (columns) nor records (rows). *)
 
-val make : string list -> t
-(** [make attrs] is a table of attributes with names [attrs] and no records. 
-    Example: [make []] = [empty] *)
+val make : string -> string list -> t
+(** [make name attrs] is a table of attributes with names [attrs] and no records. 
+    Example: [make "" []] = [empty ""] *)
 
 exception UnknownAttribute of string
 (** Raised when an attribute of the given name is not in the table. *)
@@ -22,16 +22,19 @@ exception UnknownAttribute of string
 exception UnknownRecord of string
 (** Raised when a record with the given value is not in the attribute. *)
 
-val insert_attr : t -> string -> t
-(** [insert_attr tbl attr] adds a new attribute to table [tbl]. 
+exception EmptyTable of string
+(** Raised when a table is empty. *)
+
+val insert_attr : string -> t -> string -> t
+(** [insert_attr name tbl attr] adds a new attribute to table [tbl]. 
     Requires: [attr] is not already an attribute of [tbl]. *)
 
-val update_attr : t -> string -> string -> t
-(** [update_attr tbl old_a new_a] changes the name of attribute [old_a] to 
+val update_attr : string -> t -> string -> string -> t
+(** [update_attr name tbl old_a new_a] changes the name of attribute [old_a] to 
     [new_a]. 
     Raises: [UnknownAttribute] if [old_a] is not an attribute in [tbl]. *)
 
-val delete_attr : t -> string -> t
+val delete_attr : string -> t -> string -> t
 (** [delete_attr tbl attr] removes the attribute with name [attr] from [tbl]. 
     Raises: [UnknownAttribute] if [attr] is not an attribute in [tbl]. *)
 

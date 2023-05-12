@@ -1,4 +1,9 @@
 (library
  (name base)
  (public_name Base)
- (libraries str))
+ (libraries str menhirLib))
+
+(menhir (modules parser) (flags --table --explain))
+
+(ocamllex (modules lexer))
+

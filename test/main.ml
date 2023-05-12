@@ -2,6 +2,8 @@ open OUnit2
 open Base
 open Query
 open Database
+open Parse
+open Ast
 
 let column_to_string c =
   match c with
@@ -39,9 +41,6 @@ let query_test (name : string) (str : string) (expected_output : query) : test =
   name >:: fun _ ->
   assert_equal expected_output (parse_query str) ~printer:query_to_string
 
-let pp_db_test name databases =
-  name >:: fun _ -> ignore (pp_databases databases)
-
 let command_tests =
   [
     query_test "hi" "SELECT DISTINCT hi FROM world WHERE p > 4"
@@ -58,9 +57,18 @@ let command_tests =
       };
   ]
 
-let db1 = { db_name = "db1"; db_owner = "brandon"; tables = [] }
-let db2 = { db_name = "db2"; db_owner = "edward"; tables = [] }
-let db3 = { db_name = "database3"; db_owner = "justin"; tables = [] }
-let db_tests = [ pp_db_test "db123" [ db1; db2; db3 ] ]
-let suite = "test suite for final" >::: List.flatten [ command_tests; db_tests ]
+let parse_test name str expected_output : test =
+  name >:: fun _ -> assert_equal expected_output (Parse.parse str)
+
+let parse_tests =
+  [
+    parse_test "SELECT * FROM Brandon;" "SELECT * FROM Brandon;"
+      (SELECT ([ "*" ], "Brandon", None, None, None));
+    parse_test "CREATE DATABASE Brandon;" "CREATE DATABASE Brandon;"
+      (DCREATE "Brandon");
+  ]
+
+let suite =
+  "test suite for final" >::: List.flatten [ command_tests; parse_tests ]
+
 let _ = run_test_tt_main suite

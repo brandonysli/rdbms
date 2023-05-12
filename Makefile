@@ -21,4 +21,4 @@ opendoc: doc
 	@bash opendoc.sh
 
 print:
-	OCAMLRUNPARAM=b dune exec test/main.exe
+	OCAMLRUNPARAM=b dune exec demo/ms2.exe
