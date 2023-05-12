@@ -48,7 +48,7 @@ let empty_record attrs : record =
   helper [] attrs
 
 exception UnknownAttribute of string
-exception UnknownRecord of string
+exception UnknownRecord
 exception EmptyTable of string
 
 let insert_attr attr tbl =
@@ -119,9 +119,15 @@ let delete_rec r tbl =
   { tbl with records = List.filter (fun r' -> r' <> r) tbl.records } |> rep_ok
 
 let get_record attr dat tbl =
-  tbl.records |> List.filter (fun r -> r |> List.assoc attr = dat) |> List.hd
+  try
+    tbl.records |> List.filter (fun r -> r |> List.assoc attr = dat) |> List.hd
+  with
+  | Not_found -> raise (UnknownAttribute attr)
+  | Failure x -> raise UnknownRecord
 
-let get_data attr r = List.assoc attr r
+let get_data attr r =
+  try List.assoc attr r with Not_found -> raise (UnknownAttribute attr)
+
 let attributes tbl = tbl.attributes
 let records tbl = tbl.records
 let columns tbl = tbl.attributes |> List.length
@@ -166,7 +172,7 @@ let pp_records (attrs : string list) (len : int) (div : string)
   loop "" ordered_recs
 
 let pp attrs tbl =
-  let max = 120 in
+  let max = 80 in
   if List.length attrs > 0 then
     let div = " | " in
     let div_len = String.length div in

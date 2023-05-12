@@ -3,12 +3,13 @@
 type t
 (** Abstract type representing a table. *)
 
+(** Stores the data for each record-attribute pair. *)
 type data =
   | String of string
   | Int of int
   | Float of float
   | Bool of bool
-  | Null  (** Stores the data for each record-attribute pair. *)
+  | Null
 
 type record
 (** Stores data about a given entry in the table. *)
@@ -23,7 +24,7 @@ val make : string list -> t
 exception UnknownAttribute of string
 (** Raised when an attribute of the given name is not in the table. *)
 
-exception UnknownRecord of string
+exception UnknownRecord
 (** Raised when a record with the given value is not in the attribute. *)
 
 val insert_attr : string -> t -> t
@@ -59,7 +60,9 @@ val delete_rec : record -> t -> t
 
 val get_record : string -> data -> t -> record
 (** [get_record attr dat tbl] gets the record that has data [dat] for attribute
-    [attr]. Requires: All data for attribute [attr] in [tbl] is unique. *)
+    [attr]. Requires: All data for attribute [attr] in [tbl] is unique. Raises:
+    [UnknownAttribute] if [attr] is not in [tbl]. [UnknownRecord] if no record
+    of given value exist. *)
 
 val get_data : string -> record -> data
 (** [get_data attr r tbl] gets the data from the record [r] with attribute
