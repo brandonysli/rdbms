@@ -12,12 +12,8 @@ let pp_mem =
   ^ "\n-----------------\n"
   ^ String.concat "%-17s\n" (List.map Database.get_name !mem.tables)
 
-let insert name col_list val_list m =
-  let d = Database.insert_into_table name col_list val_list !m in
-  m := d;
-  ref !m
+let insert name col_list val_list m () =
+  m := Database.insert_into_table name col_list val_list !m
 
-let add_table name col_list m =
-  let d = Database.add_table name col_list !m in
-  m := d;
-  ref !m
+let add_table name col_list m () =
+  m := Database.add_table name col_list !m

@@ -1,26 +1,12 @@
 open OUnit2
 open Rdatabase
 open Database
-<<<<<<< HEAD
 open Mem
 open Interpreter
 open Table
-open Poo
-=======
 open Parse
 open Ast
->>>>>>> b732d0319aab9fb08f9f090a79f05919e39814e2
 
-let pp_poo name = name >:: fun _ -> ignore (print_endline Poo.print_i)
-
-let poo_test =
-  [
-    pp_poo "initial";
-    (let _ = Poo.update in
-     pp_poo "after");
-  ]
-
-<<<<<<< HEAD
 let pp_db_test name databases =
   name >:: fun _ -> ignore (pp_databases databases)
 
@@ -53,13 +39,13 @@ let tbl2 =
   Database.insert_into_table "cock" [ "hi"; "bye" ] [ Int 1; Int 2 ] db0
 
 let d =
-  Mem.add_table "Test" [ ("bools", Bool false); ("ints", Int 0) ] m
+  Mem.add_table "Test" [ ("bools", Bool false); ("ints", Int 0) ] m ()
 
 let print_db =
   [
     pp_database_test "empty table";
-    pp_database "cock" (get_database d);
-    pp_database_test "table";
+    (let _ = d in
+     pp_database_test "table");
   ]
 
 let print_again = [ pp_database_test "poo" ]
@@ -73,26 +59,6 @@ let print_tbl =
 
 let db_tests = [ pp_db_test "db123" [ db1; db2; db3 ] ]
 
-let suite =
-  "test suite for final"
-  >::: List.flatten [ poo_test (*print_tbl; db_tests *) ]
-=======
-let command_tests =
-  [
-    query_test "hi" "SELECT DISTINCT hi FROM world WHERE p > 4"
-      {
-        selection = Column (Distinct [ "hi" ]);
-        table = From "world";
-        condition = Some (Greater ("p", 4));
-      };
-    query_test "hi" "SELECT DISTINCT hi, bye, no FROM world WHERE p > 4"
-      {
-        selection = Column (Distinct [ "hi"; "bye"; "no" ]);
-        table = From "world";
-        condition = Some (Greater ("p", 4));
-      };
-  ]
-
 let parse_test name str expected_output : test =
   name >:: fun _ -> assert_equal expected_output (Parse.parse str)
 
@@ -105,7 +71,7 @@ let parse_tests =
   ]
 
 let suite =
-  "test suite for final" >::: List.flatten [ command_tests; parse_tests ]
->>>>>>> b732d0319aab9fb08f9f090a79f05919e39814e2
+  "test suite for final"
+  >::: List.flatten [ print_db; print_tbl; db_tests; parse_tests ]
 
 let _ = run_test_tt_main suite
