@@ -5,4 +5,4 @@
 
 (menhir (modules parser) (flags --table --explain))
 
-(ocamllex (modules lexer yojson))
+(ocamllex (modules lexer))
