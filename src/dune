@@ -1,4 +1,11 @@
 (library
  (name Rdatabase)
  (public_name Rdatabase)
- (libraries str yojson menhirLib))
+ (libraries str menhirLib yojson))
+
+(menhir
+ (modules parser)
+ (flags --table --explain))
+
+(ocamllex
+ (modules lexer))

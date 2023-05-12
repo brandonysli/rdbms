@@ -49,6 +49,7 @@ let empty_record attrs : record =
 
 exception UnknownAttribute of string
 exception UnknownRecord of string
+exception EmptyTable of string
 
 let insert_attr attr tbl data =
   {

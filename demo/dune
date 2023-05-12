@@ -1,0 +1,3 @@
+(executable
+ (name ms2) 
+ (libraries Rdatabase ounit2))
