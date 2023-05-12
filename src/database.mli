@@ -13,6 +13,7 @@ type database = {
   db_owner : string;
   tables : table list;
 }
+(** will make abstract later *)
 
 val empty : database
 val get_table : string -> database -> table option
