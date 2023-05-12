@@ -49,11 +49,9 @@ let empty_record attrs : record =
 
 exception UnknownAttribute of string
 exception UnknownRecord of string
-exception EmptyTable of string
 
 let insert_attr attr tbl =
   {
-    name;
     attributes = attr :: tbl.attributes;
     records =
       tbl.records |> List.map (fun r -> r @ [ (attr, Null) ])
@@ -63,7 +61,6 @@ let insert_attr attr tbl =
 
 let update_attr old_a new_a tbl =
   {
-    name;
     attributes =
       tbl.attributes |> List.map (fun a -> if a = old_a then new_a else a);
     records =

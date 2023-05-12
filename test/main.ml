@@ -62,8 +62,19 @@ let parse_test name str expected_output : test =
 
 let parse_tests =
   [
-    parse_test "SELECT * FROM Brandon;" "SELECT * FROM Brandon;"
+    parse_test "Standard select all query: SELECT * FROM Brandon;"
+      "SELECT * FROM Brandon;"
       (SELECT ([ "*" ], "Brandon", None, None, None));
+    parse_test "Select two columns from table: SELECT a,b FROM Brandon;"
+      "SELECT a,b FROM Brandon;"
+      (SELECT ([ "b"; "a" ], "Brandon", None, None, None));
+    parse_test "Lowercase select and from: select a,b from Brandon;"
+      "select a,b from Brandon;"
+      (SELECT ([ "b"; "a" ], "Brandon", None, None, None));
+    parse_test
+      "Select with where clause and GT: SELECT a,b FROM Brandon WHERE a > 5;"
+      "SELECT a,b FROM Brandon WHERE a > 5;"
+      (SELECT ([ "b"; "a" ], "Brandon", Some (GT (STR "a", INT 5)), None, None));
     parse_test "CREATE DATABASE Brandon;" "CREATE DATABASE Brandon;"
       (DCREATE "Brandon");
   ]

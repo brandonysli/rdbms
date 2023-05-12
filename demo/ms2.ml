@@ -1,4 +1,4 @@
-open Base
+open Rdatabase
 open Database
 open Table
 
@@ -38,7 +38,7 @@ let databases2 =
     db5;
   ]
 
-let tb1 = make "table1" [ "col1"; "col2"; "col3"; "col4"; "col5" ]
+let tb1 = make [ "col1"; "col2"; "col3"; "col4"; "col5" ]
 
 let _ =
   ignore (pp_databases databases1);

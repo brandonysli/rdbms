@@ -5,9 +5,10 @@
 %token <int> INT
 %token <float> FLOAT
 %token <string> STR
-%token <string> ID
+%token <string> ID ID2
 %token LPAREN RPAREN COMMA STAR EQUALS LT GT LE GE NEQ AND OR SC
 %token SELECT FROM INSERT INTO VALUES DELETE UPDATE CREATE TABLE DROP DATABASE SET WHERE
+
 
 
 %left AND
@@ -51,7 +52,8 @@ expr:
   | INT { INT $1 }
   | FLOAT { FLOAT $1 }
   | STR { STR $1 }
-  | ID { COL $1 }
+  | ID2 { }
+  | ID { STR $1 }
   | ID LPAREN expr_list RPAREN { FUN($1, $3) }
 
 cond:

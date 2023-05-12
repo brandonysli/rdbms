@@ -37,5 +37,6 @@ rule token = parse
   | digit+ as i { INT(int_of_string i) }
   | digit+ '.' digit* as f { FLOAT(float_of_string f) }
   | '"' [^'"']* '"' as s { STR(String.sub s 1 (String.length s - 2)) }
+  | id '.' id { ID2(id, id)}
   | id as identifier { ID(identifier) }
   | _ as c { failwith ("unexpected character " ^ String.make 1 c) }
