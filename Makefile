@@ -22,3 +22,6 @@ opendoc: doc
 
 print:
 	OCAMLRUNPARAM=b dune exec demo/ms2.exe
+
+loc:
+	cloc --by-file --include-lang=OCaml .
