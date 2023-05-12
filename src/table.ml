@@ -1,6 +1,14 @@
-type data = String of string | Int of int | Float of float
+type data =
+  | String of string
+  | Int of int
+  | Float of float
+
 type record = (string * data option) list
-type t = { attributes : string list; records : record list }
+
+type t = {
+  attributes : string list;
+  records : record list;
+}
 (* Every attribute record list should have the same length*)
 
 let empty () : t = { attributes = []; records = [] }
@@ -26,9 +34,11 @@ let insert_attr tbl attr =
 let update_attr tbl old_a new_a =
   {
     attributes =
-      tbl.attributes |> List.map (fun a -> if a = old_a then new_a else a);
+      tbl.attributes
+      |> List.map (fun a -> if a = old_a then new_a else a);
     records =
-      (* go through every record and change old_a in assoc list to new_a *)
+      (* go through every record and change old_a in assoc list to
+         new_a *)
       tbl.records
       |> List.map (fun r ->
              r
@@ -36,7 +46,8 @@ let update_attr tbl old_a new_a =
                     if fst pair = old_a then (new_a, snd pair) else pair));
   }
 
-let delete_attr tbl attr = raise (Failure "Unimplemented: Table.delete_attr")
+let delete_attr tbl attr =
+  raise (Failure "Unimplemented: Table.delete_attr")
 
 let insert_rec tbl attr dat =
   {
@@ -45,9 +56,11 @@ let insert_rec tbl attr dat =
       tbl.records
       @ [
           tbl.attributes |> empty_record
-          |> List.map (fun p -> if fst p = attr then (attr, Some dat) else p);
+          |> List.map (fun p ->
+                 if fst p = attr then (attr, Some dat) else p);
         ]
-      (* append a new record with the data to the end of the records list *);
+      (* append a new record with the data to the end of the records
+         list *);
   }
 
 let update_data tbl r attr dat =
@@ -66,13 +79,14 @@ let update_data tbl r attr dat =
 let delete_rec tbl r = raise (Failure "Unimplemented: Table.delete_rec")
 
 let get_record tbl attr dat =
-  tbl.records |> List.filter (fun r -> r |> List.assoc attr = Some dat) |> List.hd
+  tbl.records
+  |> List.filter (fun r -> r |> List.assoc attr = Some dat)
+  |> List.hd
 
 let get_data tbl r attr =
   tbl.records |> List.find (fun x -> x = r) |> List.assoc attr
 
-let attributes tbl = 
-  tbl.attributes
+let attributes tbl = tbl.attributes
 let records tbl = tbl.records
 let columns tbl = tbl.attributes |> List.length
 let rows tbl = tbl.records |> List.length
