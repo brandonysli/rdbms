@@ -3,7 +3,7 @@ open Ast
 
 let eval (e : expr) : Database.value = failwith "unimplemented"
 
-let interpret (s : stmt) (t : Mem.t) =
+let interpret (s : stmt) =
   match s with
   | SELECT (col_list, table_name, where, join_table, join_cond) ->
       failwith "unimplemented"

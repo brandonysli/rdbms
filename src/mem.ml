@@ -1,35 +1,38 @@
 open Database
 
-type t = database ref
-
-let empty = ref Database.empty
-let mem = empty
 let get_database s = Database.database_from_file s
 
-let reset_database =
-  let files = Sys.readdir "src/database" in
-  Array.iter
-    (fun file -> Sys.remove (Filename.concat "src/database" file))
+let reset_database d =
+  let files =
+    Sys.readdir (Filename.concat "data" d.db_name)
+    |> Array.to_list
+    |> List.filter (fun s -> s <> "metadata.json")
+  in
+  List.iter
+    (fun file ->
+      Sys.remove
+        (Filename.concat (Filename.concat "data" d.db_name) file))
     files
 
 let update_database d =
-  reset_database;
+  reset_database d;
   Database.update d
 
 let pp_mem m =
-  let d = !m in
+  let d = get_database m in
   "\nTables in " ^ d.db_name ^ " | owned by " ^ d.db_owner ^ "\nName"
   ^ "\n-----------------\n"
-  ^ String.concat "\n" (List.map Database.get_name !mem.tables)
+  ^ String.concat "\n" (List.map Database.get_name d.tables)
 
-let select columns table _ _ _ () = Database.select columns table !mem
+let select columns table _ _ _ d () =
+  Database.select columns table (get_database d)
 
-let insert name col_list val_list () =
-  mem := Database.insert_into_table name col_list val_list !mem;
-  update_database !mem;
-  mem
+let insert name col_list val_list d () =
+  let db =
+    Database.insert_into_table name col_list val_list (get_database d)
+  in
+  update_database db
 
-let add_table name col_list () =
-  mem := Database.add_table name col_list !mem;
-  update_database !mem;
-  mem
+let add_table name col_list d () =
+  let db = Database.add_table name col_list (get_database d) in
+  update_database db

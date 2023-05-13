@@ -248,9 +248,13 @@ let t_to_json t =
 
 let make_pretty t = pretty_to_string t
 
-let write_json_to_file filename t =
+let write_json_to_file filename t database_name =
   let json = t_to_json t in
-  let channel = open_out ("src/database/" ^ filename ^ ".json") in
+  let channel =
+    open_out
+      (Filename.concat (Filename.concat "data" database_name) filename
+      ^ ".json")
+  in
   output_string channel (make_pretty json);
   close_out channel
 

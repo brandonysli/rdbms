@@ -16,6 +16,7 @@ type database = {
 (** will make abstract later *)
 
 val empty : database
+val make_database : string -> string -> database
 val select : string list -> string -> database -> string
 val get_table : string -> database -> table option
 val get_name : table -> string
@@ -29,4 +30,3 @@ val pp_database : database -> unit
 val pp_databases : database list -> unit
 val update : database -> unit
 val database_from_file : string -> database
-val make_database_dir : database -> unit

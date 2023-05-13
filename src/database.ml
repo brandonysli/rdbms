@@ -58,7 +58,7 @@ let rec get_table_helper name table_list =
 
 let update_table_json table d directory =
   Sys.remove (Filename.concat directory (table.table_name ^ ".json"));
-  Table.write_json_to_file table.table_name table.attr
+  Table.write_json_to_file table.table_name table.attr d.db_name
 
 let get_table name d = get_table_helper name d.tables
 
@@ -93,7 +93,7 @@ let insert_into_table name cols vals d =
                   t;
             }
           in
-          update_table_json t d "src/database";
+          update_table_json t d (Filename.concat "data" d.db_name);
           t)
         d.tables;
   }
@@ -145,24 +145,33 @@ let select cols table d =
        cols)
 
 (* Function to parse a database into a directory of JSON files *)
-let rec update_helper tables =
+let rec update_helper tables d =
   match tables with
-  | head :: tail -> Table.write_json_to_file head.table_name head.attr
+  | head :: tail ->
+      Table.write_json_to_file head.table_name head.attr d.db_name;
+      update_helper tail d
   | [] -> ()
 
-let update d = update_helper d.tables
+let update d = update_helper d.tables d
 
 (* Function to parse a directory of JSON files *)
 let table_from_file dirname s =
   {
     table_name = s;
-    attr = s |> Filename.concat dirname |> Table.read_json_file;
+    attr =
+      s ^ ".json" |> Filename.concat dirname |> Table.read_json_file;
   }
 
 let parse_directory dirname =
   let files = Sys.readdir dirname in
-  let tables = Array.map (table_from_file dirname) files in
-  Array.to_list tables
+  let tables =
+    List.map
+      (fun s -> s |> Filename.chop_extension |> table_from_file dirname)
+      (List.filter
+         (fun s -> s <> "metadata.json")
+         (Array.to_list files))
+  in
+  tables
 
 let data_of_json json =
   match json with `String s -> s | _ -> failwith "what"
@@ -176,8 +185,7 @@ let database_from_file name =
   let name, owner =
     json_to_database
       (Yojson.Basic.from_file
-         (Filename.concat "data"
-            (Filename.concat name (name ^ ".json"))))
+         (Filename.concat "data" (Filename.concat name "metadata.json")))
   in
   {
     db_name = name;
@@ -202,9 +210,7 @@ let d_to_json d =
 
 let write_database_to_file d =
   let json = d_to_json d in
-  let channel =
-    open_out ("data/" ^ d.db_name ^ "/" ^ d.db_name ^ ".json")
-  in
+  let channel = open_out ("data/" ^ d.db_name ^ "/metadata.json") in
   output_string channel (pretty_to_string json);
   close_out channel
 
@@ -219,3 +225,8 @@ let make_database_dir d =
   with Unix_error (e, _, _) ->
     write_database_to_file d;
     prerr_endline ("Failed to create directory: " ^ Unix.error_message e)
+
+let make_database name owner =
+  let db = { db_name = name; db_owner = owner; tables = [] } in
+  make_database_dir db;
+  db
