@@ -16,7 +16,8 @@ type cond =
   | OR of cond * cond
 
 type stmt =
-  | SELECT of string list * string * cond option * string option * cond option
+  | SELECT of
+      string list * string * cond option * string option * cond option
   | INSERT of string * string list * expr list
   | DELETE of string * cond option
   | UPDATE of string * (string * expr) list * cond option
