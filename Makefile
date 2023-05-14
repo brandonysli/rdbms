@@ -17,6 +17,10 @@ test:
 doc:
 	dune build @doc
 
+clean:
+	dune clean
+	rm -f rml.zip
+
 opendoc: doc
 	@bash opendoc.sh
 

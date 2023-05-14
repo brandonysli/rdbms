@@ -3,36 +3,38 @@ open Parser
 
 let string_of_token (token : token) =
   match token with
-  | WHERE -> "where"
-  | VALUES -> "values"
-  | UPDATE -> "update"
-  | TABLE -> "table"
+  | WHERE -> "WHERE"
+  | VALUES -> "VALUES"
+  | UPDATE -> "UPDATE"
+  | TABLE -> "TABLE"
   | STR s -> "\"" ^ String.escaped s ^ "\""
   | STAR -> "*"
-  | SET -> "set"
-  | SELECT -> "select"
+  | SET -> "SET"
+  | SELECT -> "SELECT"
   | RPAREN -> ")"
   | OR -> "or"
   | NEQ -> "!="
   | LT -> "<"
   | LPAREN -> "("
   | LE -> "<="
-  | INTO -> "into"
+  | INTO -> "INTO"
   | INT i -> string_of_int i
-  | INSERT -> "insert"
+  | INSERT -> "INSERT"
   | ID s -> String.escaped s
   | GT -> ">"
   | GE -> ">="
-  | FROM -> "from"
+  | FROM -> "FROM"
   | FLOAT f -> string_of_float f
   | EQUALS -> "="
   | SC -> ";"
-  | DROP -> "drop"
-  | DELETE -> "delete"
-  | DATABASE -> "database"
-  | CREATE -> "create"
+  | DROP -> "DROP"
+  | DELETE -> "DELETE"
+  | DATABASE -> "DATABASE"
+  | CREATE -> "CREATE"
   | COMMA -> ","
   | AND -> "and"
+  | AS -> "as"
+  | PAIR (s1, s2) -> "(" ^ s1 ^ ", " ^ s2 ^ ")"
 
 let parse s =
   let lexbuf = Lexing.from_string s in
@@ -43,3 +45,8 @@ let parse s =
   | Failure s -> failwith ("Parse error: " ^ s)
   | Parser.Error ->
       failwith ("Parser error: " ^ string_of_token (Lexer.token lexbuf))
+
+let token lexbuf =
+  let result = Lexer.token lexbuf in
+  let () = print_endline (string_of_token result) in
+  result

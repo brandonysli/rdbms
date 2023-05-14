@@ -2,7 +2,7 @@ type expr =
   | STR of string
   | INT of int
   | FLOAT of float
-  | COL of string
+  | PAIR of string * string
   | FUN of string * expr list
 
 type cond =
@@ -17,7 +17,12 @@ type cond =
 
 type stmt =
   | SELECT of
-      string list * string * cond option * string option * cond option
+      string list
+      * string
+      * string option
+      * cond option
+      * string option
+      * cond option
   | INSERT of string * string list * expr list
   | DELETE of string * cond option
   | UPDATE of string * (string * expr) list * cond option

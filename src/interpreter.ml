@@ -6,7 +6,8 @@ let eval (e : expr) : Database.value = failwith "unimplemented"
 
 let interpret (s : stmt) (state : State.t) =
   match s with
-  | SELECT (col_list, table_name, where, join_table, join_cond) ->
+  | SELECT (col_list, table_name, alias, where, join_table, join_cond)
+    ->
       failwith "unimplemented"
   | INSERT (table, col_list, val_list) ->
       Mem.insert table col_list
