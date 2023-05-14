@@ -25,7 +25,7 @@ type table = TBL of string * string option
 type join = JOIN of join_type * table * cond
 
 type stmt =
-  | SELECT of string list * table * join list option * cond option
+  | SELECT of string list * table list * join list option * cond option
   | INSERT of string * string list * expr list
   | DELETE of string * cond option
   | UPDATE of string * (string * expr) list * cond option

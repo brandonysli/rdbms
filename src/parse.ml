@@ -35,6 +35,12 @@ let string_of_token (token : token) =
   | AND -> "and"
   | AS -> "as"
   | PAIR (s1, s2) -> "(" ^ s1 ^ ", " ^ s2 ^ ")"
+  | INNER -> "INNER"
+  | JOIN -> "JOIN"
+  | ON -> "ON"
+  | RIGHT -> "OUTER"
+  | LEFT -> "LEFT"
+  | FULL -> "FULL"
 
 let parse s =
   let lexbuf = Lexing.from_string s in

@@ -17,7 +17,7 @@ rule token = parse
   | '>' { GT }
   | "<=" { LE }
   | ">=" { GE }
-  | "<>" { NEQ }
+  | "!=" { NEQ }
   | "and" | "AND" { AND }
   | "or" | "OR" { OR }
   | ";" { SC }
@@ -35,6 +35,12 @@ rule token = parse
   | "set" | "SET" { SET }
   | "database" | "DATABASE" { DATABASE }
   | "as" | "AS" { AS }
+  | "inner" | "INNER" { INNER }
+  | "left" | "LEFT" { LEFT }
+  | "right" | "RIGHT" { RIGHT }
+  | "join" | "JOIN" { JOIN }
+  | "on" | "ON" { ON }
+  | "full" | "FULL" { FULL }
   | digit+ as i { INT(int_of_string i) }
   | digit+ '.' digit* as f { FLOAT(float_of_string f) }
   | '"' [^'"']* '"' as s { STR(String.sub s 1 (String.length s - 2)) }
