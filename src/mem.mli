@@ -12,3 +12,5 @@ val add_table :
 val remove_table : string -> string -> unit -> unit
 val create_database : string -> string -> unit
 val drop_database : string -> unit
+val list_databases : unit -> unit
+val is_database : string -> bool

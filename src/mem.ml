@@ -42,3 +42,24 @@ let create_database name owner =
   update_database db
 
 let drop_database name = Database.remove_database name
+
+let list_databases () =
+  print_endline "Databases: \n";
+  let directory_path = "data" in
+  let files = Sys.readdir directory_path in
+  Array.iter
+    (fun file ->
+      let file_path = Filename.concat directory_path file in
+      if Sys.is_directory file_path then Printf.printf "%s/\n" file)
+    files;
+  print_endline ""
+
+let is_database directory_name =
+  let directory_path = "data" in
+  let full_path = Filename.concat directory_path directory_name in
+  try
+    let file_info = Unix.stat full_path in
+    file_info.Unix.st_kind = Unix.S_DIR
+  with
+  | Unix.Unix_error (Unix.ENOENT, _, _) -> false
+  | _ -> false

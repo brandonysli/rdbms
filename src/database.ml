@@ -15,6 +15,12 @@ type value =
 type cond =
   | And of cond * cond
   | Or of cond * cond
+  | GE of value * value
+  | LE of value * value
+  | GT of value * value
+  | LT of value * value
+  | EQ of value * value
+  | NE of value * value
 
 type row = value list
 
@@ -30,6 +36,7 @@ type database = {
 }
 
 let get_database_name d = d.db_name
+let get_database_owner d = d.db_owner
 let get_database_tables d = d.tables
 let empty = { db_name = "Empty"; db_owner = "nobody"; tables = [] }
 

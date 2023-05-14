@@ -36,7 +36,7 @@ let rec eval_cond (c : cond) =
   | AND (c1, c2) -> eval_cond c1 && eval_cond c2
   | OR (c1, c2) -> eval_cond c1 || eval_cond c2
 
-let interpret (s : stmt) (state : State.t) =
+let interpret (s : stmt) (state : State.t) : State.t =
   match s with
   | SELECT (col_list, table_name, alias, where, join_table, join_cond)
     ->
@@ -45,14 +45,22 @@ let interpret (s : stmt) (state : State.t) =
       Mem.insert table col_list
         (List.map eval val_list)
         (State.get_database state)
-        ()
+        ();
+      state
   | DELETE (table, cond) -> failwith "unimplemented"
   | UPDATE (table, updates, cond) -> failwith "unimplemented"
   | TCREATE (name, columns) ->
       Mem.add_table name
         (List.map (fun (s, x) -> (s, eval x)) columns)
         (State.get_database state)
-        ()
-  | TDROP name -> Mem.remove_table name (State.get_database state) ()
-  | DCREATE name -> Mem.create_database name (State.get_owner state)
-  | DDROP name -> Mem.drop_database name
+        ();
+      state
+  | TDROP name ->
+      Mem.remove_table name (State.get_database state) ();
+      state
+  | DCREATE name ->
+      Mem.create_database name (State.get_owner state);
+      State.update_state name (State.get_owner state)
+  | DDROP name ->
+      Mem.drop_database name;
+      State.update_state "" (State.get_owner state)

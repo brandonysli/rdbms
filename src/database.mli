@@ -11,6 +11,7 @@ type table
 type database
 (** will make abstract later *)
 val get_database_name : database -> string
+val get_database_owner : database -> string
 
 val empty : database
 val make_database : string -> string -> database
