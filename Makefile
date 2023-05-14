@@ -29,3 +29,7 @@ print:
 
 testparse:
 	OCAMLRUNPARAM=b dune exec testparse/main.exe
+
+repl:
+	OCAMLRUNPARAM=b dune exec bin/repl.exe
+
