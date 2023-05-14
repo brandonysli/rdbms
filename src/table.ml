@@ -277,3 +277,9 @@ let t_of_json json =
 let read_json_file filename =
   let json = Yojson.Basic.from_file filename in
   t_of_json json
+
+let delete_from_table f table =
+  {
+    attributes = table.attributes;
+    records = List.filter f table.records;
+  }

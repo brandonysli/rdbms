@@ -12,16 +12,6 @@ type value =
   | Bool of bool
   | Null
 
-type cond =
-  | And of cond * cond
-  | Or of cond * cond
-  | GE of value * value
-  | LE of value * value
-  | GT of value * value
-  | LT of value * value
-  | EQ of value * value
-  | NE of value * value
-
 type row = value list
 
 type table = {
@@ -259,4 +249,50 @@ let make_database name owner =
 let remove_database name =
   Sys.command ("rm -r " ^ Filename.concat "data" name) |> ignore
 
-let delete name cond d = failwith "unimplemented"
+type condition =
+  | And of condition * condition
+  | Or of condition * condition
+  | GE of string * value
+  | LE of string * value
+  | GT of string * value
+  | LT of string * value
+  | EQ of string * value
+  | NE of string * value
+
+let value_to_data value : Table.data =
+  match value with
+  | Int i -> Int i
+  | Float f -> Float f
+  | Bool b -> Bool b
+  | String s -> String s
+  | Null -> Null
+
+let rec record_sats_cond cond record =
+  match cond with
+  | And (c1, c2) ->
+      record_sats_cond c1 record && record_sats_cond c2 record
+  | Or (c1, c2) ->
+      record_sats_cond c1 record || record_sats_cond c2 record
+  | GE (s, d) -> get_data s record >= value_to_data d
+  | LE (s, d) -> get_data s record >= value_to_data d
+  | GT (s, d) -> get_data s record > value_to_data d
+  | LT (s, d) -> get_data s record < value_to_data d
+  | EQ (s, d) -> get_data s record = value_to_data d
+  | NE (s, d) -> get_data s record <> value_to_data d
+
+let delete name cond d =
+  match get_table name d with
+  | Some table ->
+      {
+        db_name = d.db_name;
+        db_owner = d.db_owner;
+        tables =
+          update_tables name
+            (fun t ->
+              {
+                table_name = name;
+                attr = delete_from_table (record_sats_cond cond) t;
+              })
+            d.tables;
+      }
+  | None -> d

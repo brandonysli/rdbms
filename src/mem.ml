@@ -33,7 +33,7 @@ let add_table name col_list d () =
   let db = Database.add_table name col_list (get_database d) in
   update_database db
 
-let remove_table name d () =
+let drop_table name d () =
   let db = Database.remove_table name (Database.database_from_file d) in
   update_database db
 

@@ -89,4 +89,12 @@ val pp : t -> string
 (** [pp tbl] return the table as a string. *)
 
 val write_json_to_file : string -> t -> string -> unit
+(** [write_json_to_file filename t database_name] writes a table into a
+    json file*)
+
 val read_json_file : string -> t
+(** [read_json_file filename] reads a json file into a table*)
+
+val delete_from_table : (record -> bool) -> t -> t
+(** [read_json_file table f] deletes records stored in table that
+    satisfy condition f*)

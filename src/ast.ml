@@ -15,14 +15,17 @@ type cond =
   | AND of cond * cond
   | OR of cond * cond
 
+type join_type =
+  | INNER
+  | LEFT
+  | RIGHT
+  | FULL
+
+type table = TBL of string * string option
+type join = JOIN of join_type * table * cond
+
 type stmt =
-  | SELECT of
-      string list
-      * string
-      * string option
-      * cond option
-      * string option
-      * cond option
+  | SELECT of string list * table * join list option * cond option
   | INSERT of string * string list * expr list
   | DELETE of string * cond option
   | UPDATE of string * (string * expr) list * cond option

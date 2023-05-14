@@ -9,37 +9,26 @@ let eval (e : expr) : Database.value =
   | FLOAT f -> Float f
   | _ -> Null
 
-let rec eval_cond (c : cond) =
+let rec eval_cond (c : cond) : Database.condition =
   match c with
-  | EQ (e1, e2) -> eval e1 = eval e2
-  | NEQ (e1, e2) -> eval e1 <> eval e2
-  | LT (e1, e2) -> (
-      match (e1, e2) with
-      | INT i1, INT i2 -> i1 < i2
-      | FLOAT i1, FLOAT i2 -> i1 < i2
-      | _ -> failwith "How did we get here")
-  | GT (e1, e2) -> (
-      match (e1, e2) with
-      | INT i1, INT i2 -> i1 > i2
-      | FLOAT i1, FLOAT i2 -> i1 > i2
-      | _ -> failwith "How did we get here")
-  | LE (e1, e2) -> (
-      match (e1, e2) with
-      | INT i1, INT i2 -> i1 <= i2
-      | FLOAT i1, FLOAT i2 -> i1 <= i2
-      | _ -> failwith "How did we get here")
-  | GE (e1, e2) -> (
-      match (e1, e2) with
-      | INT i1, INT i2 -> i1 >= i2
-      | FLOAT i1, FLOAT i2 -> i1 >= i2
-      | _ -> failwith "How did we get here")
-  | AND (c1, c2) -> eval_cond c1 && eval_cond c2
-  | OR (c1, c2) -> eval_cond c1 || eval_cond c2
+  | AND (c1, c2) -> And (eval_cond c1, eval_cond c2)
+  | OR (c1, c2) -> Or (eval_cond c1, eval_cond c2)
+  | GE (s, d) -> (
+      match s with STR str -> GE (str, eval d) | _ -> failwith "?")
+  | LE (s, d) -> (
+      match s with STR str -> LE (str, eval d) | _ -> failwith "?")
+  | GT (s, d) -> (
+      match s with STR str -> GT (str, eval d) | _ -> failwith "?")
+  | LT (s, d) -> (
+      match s with STR str -> LT (str, eval d) | _ -> failwith "?")
+  | EQ (s, d) -> (
+      match s with STR str -> EQ (str, eval d) | _ -> failwith "?")
+  | NEQ (s, d) -> (
+      match s with STR str -> NE (str, eval d) | _ -> failwith "?")
 
 let interpret (s : stmt) (state : State.t) : State.t =
   match s with
-  | SELECT (col_list, table_name, alias, where, join_table, join_cond)
-    ->
+  | SELECT (col_list, table, join_table, join_cond) ->
       failwith "unimplemented"
   | INSERT (table, col_list, val_list) ->
       Mem.insert table col_list
@@ -56,7 +45,7 @@ let interpret (s : stmt) (state : State.t) : State.t =
         ();
       state
   | TDROP name ->
-      Mem.remove_table name (State.get_database state) ();
+      Mem.drop_table name (State.get_database state) ();
       state
   | DCREATE name ->
       Mem.create_database name (State.get_owner state);

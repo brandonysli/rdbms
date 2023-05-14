@@ -5,14 +5,24 @@ type value =
   | Bool of bool
   | Null
 
+type condition =
+  | And of condition * condition
+  | Or of condition * condition
+  | GE of string * value
+  | LE of string * value
+  | GT of string * value
+  | LT of string * value
+  | EQ of string * value
+  | NE of string * value
+
 type row = value list
 type table
 
 type database
 (** will make abstract later *)
+
 val get_database_name : database -> string
 val get_database_owner : database -> string
-
 val empty : database
 val make_database : string -> string -> database
 val select : string list -> string -> database -> string
