@@ -41,15 +41,7 @@ let databases2 =
     db5;
   ]
 
-let tb1 =
-  make
-    [
-      ("col1", Int 0);
-      ("col2", Int 0);
-      ("col3", Int 0);
-      ("col4", Int 0);
-      ("col5", Int 0);
-    ]
+let tb1 = make []
 
 let _ =
   ignore (pp_databases databases1);

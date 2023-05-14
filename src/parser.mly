@@ -5,8 +5,9 @@
 %token <int> INT
 %token <float> FLOAT
 %token <string> STR
-%token <string> ID ID2
-%token LPAREN RPAREN COMMA STAR EQUALS LT GT LE GE NEQ AND OR SC
+%token <string> ID 
+%token <string * string> PAIR 
+%token LPAREN RPAREN COMMA STAR EQUALS LT GT LE GE NEQ AND OR SC AS
 %token SELECT FROM INSERT INTO VALUES DELETE UPDATE CREATE TABLE DROP DATABASE SET WHERE
 
 
@@ -22,15 +23,16 @@ prog:
   | stmt { $1 }
 
 stmt:
-  | SELECT column_list FROM ID SC { SELECT($2, $4, None, None, None) }
-  | SELECT column_list FROM ID WHERE cond SC { SELECT($2, $4, Some $6, None, None) }
-  | INSERT INTO ID LPAREN id_list RPAREN VALUES LPAREN expr_list RPAREN SC { INSERT($3, $5, $9) }
-  | DELETE FROM ID SC { DELETE($3, None) }
-  | UPDATE ID SET update_list SC { UPDATE($2, $4, None) }
-  | CREATE TABLE ID LPAREN id_type_list RPAREN SC { TCREATE($3, $5) }
-  | DROP TABLE ID SC { TDROP($3) }
-  | CREATE DATABASE ID SC { DCREATE($3) }
-  | DROP DATABASE ID SC { DDROP($3) }
+  | SELECT column_list FROM STR SC { SELECT($2, $4, None, None, None, None) }
+  | SELECT column_list FROM STR WHERE cond SC { SELECT($2, $4, None, Some $6, None, None) }
+  | SELECT column_list FROM STR AS ID WHERE cond SC { SELECT($2, $4, Some $6, Some $8, None, None) } 
+  | INSERT INTO STR LPAREN id_list RPAREN VALUES LPAREN expr_list RPAREN SC { INSERT($3, $5, $9) }
+  | DELETE FROM STR SC { DELETE($3, None) }
+  | UPDATE STR SET update_list SC { UPDATE($2, $4, None) }
+  | CREATE TABLE STR LPAREN id_type_list RPAREN SC { TCREATE($3, $5) }
+  | DROP TABLE STR SC { TDROP($3) }
+  | CREATE DATABASE STR SC { DCREATE($3) }
+  | DROP DATABASE STR SC { DDROP($3) }
 
 column_list:
   | STAR { ["*"] }
@@ -52,7 +54,7 @@ expr:
   | INT { INT $1 }
   | FLOAT { FLOAT $1 }
   | STR { STR $1 }
-  | ID2 { }
+  | PAIR { PAIR (fst $1, snd $1) }
   | ID { STR $1 }
   | ID LPAREN expr_list RPAREN { FUN($1, $3) }
 
