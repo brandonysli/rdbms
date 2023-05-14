@@ -34,7 +34,7 @@ rule token = parse
   | "where" | "WHERE" { WHERE }
   | "set" | "SET" { SET }
   | "database" | "DATABASE" { DATABASE }
-  | "as" { AS }
+  | "as" | "AS" { AS }
   | digit+ as i { INT(int_of_string i) }
   | digit+ '.' digit* as f { FLOAT(float_of_string f) }
   | '"' [^'"']* '"' as s { STR(String.sub s 1 (String.length s - 2)) }

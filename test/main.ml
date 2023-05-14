@@ -81,58 +81,6 @@ let print_tbl =
 
 let db_tests = [ pp_db_test "db123" [ db1; db2; db3 ] ]
 
-let parse_test name str expected_output : test =
-  name >:: fun _ -> assert_equal expected_output (Parse.parse str)
-
-let token_test name str expected_output : test =
-  name >:: fun _ ->
-  assert_equal expected_output
-    (string_of_token (Parse.token (Lexing.from_string str)))
-
-let parse_tests =
-  [
-    parse_test "Standard select all query: SELECT * FROM Brandon;"
-      "SELECT * FROM \"Brandon\";"
-      (SELECT ([ "*" ], "Brandon", None, None, None, None));
-    parse_test "Select two columns from table: SELECT a,b FROM Brandon;"
-      "SELECT a,b FROM \"Brandon\";"
-      (SELECT ([ "b"; "a" ], "Brandon", None, None, None, None));
-    parse_test "Lowercase select and from: select a,b from Brandon;"
-      "select a,b from \"Brandon\";"
-      (SELECT ([ "b"; "a" ], "Brandon", None, None, None, None));
-    parse_test
-      "Select with where clause and GT: SELECT a,b FROM Brandon WHERE \
-       a > 5;"
-      "SELECT a,b FROM \"Brandon\" WHERE a > 5;"
-      (SELECT
-         ( [ "b"; "a" ],
-           "Brandon",
-           None,
-           Some (GT (STR "a", INT 5)),
-           None,
-           None ));
-    parse_test
-      "Select with where clause and GT: SELECT a,b FROM Brandon WHERE \
-       Brandon.id = \"id1\";"
-      "SELECT a,b FROM \"Brandon\" WHERE Brandon.id = \"id1\";"
-      (SELECT
-         ( [ "b"; "a" ],
-           "Brandon",
-           None,
-           Some (EQ (PAIR ("Brandon", "id"), STR "id1")),
-           None,
-           None ));
-    parse_test "CREATE DATABASE Brandon;" "CREATE DATABASE \"Brandon\";"
-      (DCREATE "Brandon");
-  ]
-
-let token_tests =
-  [
-    token_test "token test Brandon.id" "Brandon.id" "(Brandon, id)";
-    token_test "token test WHERE" "WHERE" "WHERE";
-    token_test "token test \"id1\"" "\"id1\"" "\"id1\"";
-  ]
-
 let json_test name file_name table : test =
   name >:: fun _ ->
   ignore (Table.write_json_to_file file_name table "testing")
@@ -142,13 +90,6 @@ let json_tests = [ json_test "json" "test" json_table ]
 let suite =
   "test suite for final"
   >::: List.flatten
-         [
-           json_tests;
-           print_table_test;
-           print_db;
-           print_tbl;
-           parse_tests;
-           token_tests;
-         ]
+         [ json_tests; print_table_test; print_db; print_tbl ]
 
 let _ = run_test_tt_main suite

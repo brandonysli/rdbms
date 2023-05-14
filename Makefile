@@ -1,4 +1,4 @@
-.PHONY: test check
+.PHONY: test check testparse
 
 build:
 	dune build
@@ -12,7 +12,8 @@ utop:
 	OCAMLRUNPARAM=b dune utop src
 
 test:
-	OCAMLRUNPARAM=b dune exec test/main.exe
+	-OCAMLRUNPARAM=b dune exec test/main.exe 
+	-OCAMLRUNPARAM=b dune exec testparse/main.exe
 
 doc:
 	dune build @doc
@@ -26,3 +27,10 @@ opendoc: doc
 
 print:
 	OCAMLRUNPARAM=b dune exec demo/ms2.exe
+
+testparse:
+	OCAMLRUNPARAM=b dune exec testparse/main.exe
+
+repl:
+	OCAMLRUNPARAM=b dune exec bin/repl.exe
+
