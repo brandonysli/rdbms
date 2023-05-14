@@ -18,12 +18,15 @@ let conv (yj : Yojson.Basic.t) : Table.data =
 let parse j : Table.t =
   let open Yojson.Basic.Util in
   (* ['] indicates var contains unconverted Yojson types *)
-  let table' = j |> to_list in (* elements of JSON table *)
-  let records' = table' |> List.map (to_assoc) in 
-  let records = List.map (List.map (fun (a, d) -> (a, conv d))) records' in
+  let table' = j |> to_list in
+  (* elements of JSON table *)
+  let records' = table' |> List.map to_assoc in
+  let records =
+    List.map (List.map (fun (a, d) -> (a, conv d))) records'
+  in
   let tbl =
     List.fold_right
-      (fun (a, _) (t : Table.t) -> Table.insert_attr a t)
+      (fun (a, d) (t : Table.t) -> Table.insert_attr a t d)
       (List.hd records) Table.empty
   in
   List.fold_right (fun r t -> Table.insert_full_rec r t) records tbl
