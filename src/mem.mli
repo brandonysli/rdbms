@@ -1,11 +1,12 @@
 open Database
 
-type t
-(** Scuffed storage of a singular database *)
+val select :
+  string list -> string -> 'a -> 'b -> 'c -> string -> unit -> string
 
-val empty : t
-val mem : t
-val get_database : t -> database
-val insert : string -> string list -> value list -> t -> unit -> unit
-val add_table : string -> (string * value) list -> t -> unit -> unit
-val pp_mem : string
+val insert :
+  string -> string list -> value list -> string -> unit -> unit
+
+val add_table :
+  string -> (string * value) list -> string -> unit -> unit
+
+val pp_mem : string -> string

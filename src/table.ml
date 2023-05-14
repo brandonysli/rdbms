@@ -1,3 +1,6 @@
+open Yojson.Safe
+open Yojson.Basic.Util
+
 type data =
   | String of string
   | Int of int
@@ -208,3 +211,69 @@ let pp tbl =
     attr_str ^ "\n" ^ h_line ^ "\n" ^ rec_str
   else pad_right_char max "-" ""
 (* attrs |> pp_attributes "" |> () in " " *)
+
+(*JSON STUFF*)
+
+let data_to_json (d : data) : Yojson.Safe.t =
+  match d with
+  | Int i -> `Int i
+  | Float f -> `Float f
+  | String s -> `String s
+  | Bool b -> `Bool b
+  | Null -> `Null
+
+let data_of_json json =
+  match json with
+  | `Int i -> Int i
+  | `Float f -> Float f
+  | `String s -> String s
+  | `Bool b -> Bool b
+  | `Null -> Null
+  | _ -> failwith "Invalid data value"
+
+let record_to_json record =
+  `Assoc
+    (List.map (fun (key, value) -> (key, data_to_json value)) record)
+
+let t_to_json t =
+  let attributes_json =
+    `Assoc
+      (List.map
+         (fun (key, value) -> (key, data_to_json value))
+         t.attributes)
+  in
+  let records_json = `List (List.map record_to_json t.records) in
+  `Assoc [ ("attributes", attributes_json); ("records", records_json) ]
+
+let make_pretty t = pretty_to_string t
+
+let write_json_to_file filename t database_name =
+  let json = t_to_json t in
+  let channel =
+    open_out
+      (Filename.concat (Filename.concat "data" database_name) filename
+      ^ ".json")
+  in
+  output_string channel (make_pretty json);
+  close_out channel
+
+let record_of_json json =
+  match json with
+  | `Assoc fields ->
+      List.map (fun (key, value) -> (key, data_of_json value)) fields
+  | _ -> failwith "Invalid record value"
+
+let t_of_json json =
+  let attributes_json = member "attributes" json in
+  let records_json = member "records" json in
+  let attributes =
+    List.map
+      (fun (key, value) -> (key, data_of_json value))
+      (to_assoc attributes_json)
+  in
+  let records = List.map record_of_json (to_list records_json) in
+  { attributes; records }
+
+let read_json_file filename =
+  let json = Yojson.Basic.from_file filename in
+  t_of_json json

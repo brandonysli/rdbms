@@ -87,3 +87,6 @@ val pp_data : data -> string
 
 val pp : t -> string
 (** [pp tbl] return the table as a string. *)
+
+val write_json_to_file : string -> t -> string -> unit
+val read_json_file : string -> t
