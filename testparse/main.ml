@@ -15,56 +15,68 @@ let token_test name str expected_output : test =
   assert_equal expected_output
     (string_of_token (Parse.token (Lexing.from_string str)))
 
-let parse_tests =
+let select_tests =
   [
     parse_test "Standard select all query: SELECT * FROM Brandon;"
-      "SELECT * FROM \"Brandon\";"
-      (SELECT ([ "*" ], "Brandon", None, None, None, None));
+      "SELECT * FROM Brandon;"
+      (SELECT ([ "*" ], [ TBL ("Brandon", None) ], None, None));
     parse_test "Select two columns from table: SELECT a,b FROM Brandon;"
-      "SELECT a,b FROM \"Brandon\";"
-      (SELECT ([ "b"; "a" ], "Brandon", None, None, None, None));
+      "SELECT a,b FROM Brandon;"
+      (SELECT ([ "a"; "b" ], [ TBL ("Brandon", None) ], None, None));
     parse_test "Lowercase select and from: select a,b from Brandon;"
-      "select a,b from \"Brandon\";"
-      (SELECT ([ "b"; "a" ], "Brandon", None, None, None, None));
+      "select a,b from Brandon;"
+      (SELECT ([ "a"; "b" ], [ TBL ("Brandon", None) ], None, None));
     parse_test
       "Select with where clause and GT: SELECT a,b FROM Brandon WHERE \
        a > 5;"
-      "SELECT a,b FROM \"Brandon\" WHERE a > 5;"
+      "SELECT a,b FROM Brandon WHERE a > 5;"
       (SELECT
-         ( [ "b"; "a" ],
-           "Brandon",
+         ( [ "a"; "b" ],
+           [ TBL ("Brandon", None) ],
            None,
-           Some (GT (STR "a", INT 5)),
-           None,
-           None ));
+           Some (GT (STR "a", INT 5)) ));
     parse_test
       "Select with where clause and GT: SELECT a,b FROM Brandon WHERE \
        Brandon.id = \"id1\";"
-      "SELECT a,b FROM \"Brandon\" WHERE Brandon.id = \"id1\";"
+      "SELECT a,b FROM Brandon WHERE Brandon.id = \"id1\";"
       (SELECT
-         ( [ "b"; "a" ],
-           "Brandon",
+         ( [ "a"; "b" ],
+           [ TBL ("Brandon", None) ],
            None,
-           Some (EQ (PAIR ("Brandon", "id"), STR "id1")),
-           None,
-           None ));
+           Some (EQ (PAIR ("Brandon", "id"), STR "id1")) ));
     parse_test
       "Select all without where clause and alias: SELECT * FROM \
        Brandon as b;"
-      "SELECT * FROM \"Brandon\" as b;"
-      (SELECT ([ "*" ], "Brandon", Some "b", None, None, None));
+      "SELECT * FROM Brandon as b;"
+      (SELECT ([ "*" ], [ TBL ("Brandon", Some "b") ], None, None));
     parse_test
       "Select all with where clase and alias: SELECT * FROM 'Brandon' \
        as b WHERE b.id = 'id1';"
-      "SELECT * FROM \"Brandon\" as b WHERE b.id = \"id1\";"
+      "SELECT * FROM Brandon as b WHERE b.id = \"id1\";"
       (SELECT
          ( [ "*" ],
-           "Brandon",
-           Some "b",
-           Some (EQ (PAIR ("b", "id"), STR "id1")),
+           [ TBL ("Brandon", Some "b") ],
            None,
-           None ));
-    parse_test "CREATE DATABASE Brandon;" "CREATE DATABASE \"Brandon\";"
+           Some (EQ (PAIR ("b", "id"), STR "id1")) ));
+    parse_test "Select all with join and 2 aliases and where clause"
+      "SELECT * FROM Brandon as b, Brandon2 as b2 INNER JOIN Brandon3 \
+       as b3 ON b3.id = b2.id WHERE b.id = b2.id;"
+      (SELECT
+         ( [ "*" ],
+           [ TBL ("Brandon", Some "b"); TBL ("Brandon2", Some "b2") ],
+           Some
+             [
+               JOIN
+                 ( INNER,
+                   TBL ("Brandon3", Some "b3"),
+                   EQ (PAIR ("b3", "id"), PAIR ("b2", "id")) );
+             ],
+           Some (EQ (PAIR ("b", "id"), PAIR ("b2", "id"))) ));
+  ]
+
+let create_db_tests =
+  [
+    parse_test "CREATE DATABASE Brandon;" "CREATE DATABASE Brandon;"
       (DCREATE "Brandon");
   ]
 
@@ -91,6 +103,6 @@ let token_tests =
   ]
 
 let suite =
-  "parse test suite" >::: List.flatten [ parse_tests; token_tests ]
+  "parse test suite" >::: List.flatten [ select_tests; token_tests ]
 
 let _ = run_test_tt_main suite

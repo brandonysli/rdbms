@@ -13,7 +13,7 @@ let rec repl () =
   | "quit" -> ()
   | _ ->
       let ast = parse line in
-      ignore (interpret ast);
+      ignore (interpret ast "" ());
       (* Pass the memory state to `pp_mem` *)
       (* print_endline ("The current state of\n the memory: " ^
          pp_mem); *)
