@@ -1,0 +1,112 @@
+{
+  "attributes": {
+    "a1": "this is a really fing long string that should be cropped",
+    "a2": "2d1",
+    "a3": "3d1",
+    "a4": "4d1",
+    "a5": "5d1",
+    "a6": null,
+    "a7": null,
+    "a8": 1,
+    "a9": true,
+    "a10": 1.01
+  },
+  "records": [
+    {
+      "a10": 1.01,
+      "a9": true,
+      "a8": 1,
+      "a7": null,
+      "a6": null,
+      "a5": "5d1",
+      "a4": "4d1",
+      "a3": "3d1",
+      "a2": "2d1",
+      "a1": "this is a really fing long string that should be cropped"
+    },
+    {
+      "a10": 1.01,
+      "a9": true,
+      "a8": 1,
+      "a7": null,
+      "a6": null,
+      "a5": "5d2",
+      "a4": "4d2",
+      "a3": "3d2",
+      "a2": "2d2",
+      "a1": "1d2"
+    },
+    {
+      "a10": 1.01,
+      "a9": true,
+      "a8": 1,
+      "a7": null,
+      "a6": null,
+      "a5": "5d3",
+      "a4": "4d3",
+      "a3": "3d3",
+      "a2": "2d3",
+      "a1": "1d3"
+    },
+    {
+      "a10": 1.01,
+      "a9": true,
+      "a8": 1,
+      "a7": null,
+      "a6": null,
+      "a5": "5d4",
+      "a4": "4d4",
+      "a3": "3d4",
+      "a2": "2d4",
+      "a1": "1d4"
+    },
+    {
+      "a10": 1.01,
+      "a9": true,
+      "a8": 1,
+      "a7": null,
+      "a6": null,
+      "a5": null,
+      "a4": null,
+      "a3": null,
+      "a2": null,
+      "a1": null
+    },
+    {
+      "a10": 1.01,
+      "a9": true,
+      "a8": 1,
+      "a7": null,
+      "a6": null,
+      "a5": null,
+      "a4": null,
+      "a3": null,
+      "a2": null,
+      "a1": null
+    },
+    {
+      "a10": 1.01,
+      "a9": true,
+      "a8": 1,
+      "a7": null,
+      "a6": null,
+      "a5": null,
+      "a4": null,
+      "a3": null,
+      "a2": null,
+      "a1": null
+    },
+    {
+      "a10": 1.01,
+      "a9": true,
+      "a8": 1,
+      "a7": null,
+      "a6": null,
+      "a5": null,
+      "a4": null,
+      "a3": null,
+      "a2": null,
+      "a1": null
+    }
+  ]
+}

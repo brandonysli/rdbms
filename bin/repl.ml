@@ -31,7 +31,7 @@ let rec repl st () =
       "You are not the owner of this database! Try another database!";
     not_database_handler (read_line ()) st)
   else (
-    print_string "> ";
+    print_string (State.get_database st ^ "> ");
     let line = read_line () in
     if line = "quit" then ()
     else
@@ -42,6 +42,7 @@ let rec repl st () =
       | _ ->
           let ast = parse line in
           let new_st = interpret ast st in
+          print_endline "Success!";
           repl new_st ())
 
 and not_database_handler line st =

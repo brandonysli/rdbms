@@ -258,6 +258,7 @@ type condition =
   | LT of string * value
   | EQ of string * value
   | NE of string * value
+  | None
 
 let value_to_data value : Table.data =
   match value with
@@ -279,8 +280,9 @@ let rec record_sats_cond cond record =
   | LT (s, d) -> get_data s record < value_to_data d
   | EQ (s, d) -> get_data s record = value_to_data d
   | NE (s, d) -> get_data s record <> value_to_data d
+  | None -> true
 
-let delete name cond d =
+let delete_from_table name cond d =
   match get_table name d with
   | Some table ->
       {
@@ -293,6 +295,20 @@ let delete name cond d =
                 table_name = name;
                 attr = delete_from_table (record_sats_cond cond) t;
               })
+            d.tables;
+      }
+  | None -> d
+
+let delete_all_from_table name d =
+  match get_table name d with
+  | Some table ->
+      {
+        db_name = d.db_name;
+        db_owner = d.db_owner;
+        tables =
+          update_tables name
+            (fun t ->
+              { table_name = name; attr = delete_all_from_table t })
             d.tables;
       }
   | None -> d

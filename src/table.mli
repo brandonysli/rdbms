@@ -98,3 +98,6 @@ val read_json_file : string -> t
 val delete_from_table : (record -> bool) -> t -> t
 (** [read_json_file table f] deletes records stored in table that
     satisfy condition f*)
+
+val delete_all_from_table : t -> t
+(** [read_json_file table f] deletes all records stored in table t*)

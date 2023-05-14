@@ -14,6 +14,7 @@ type condition =
   | LT of string * value
   | EQ of string * value
   | NE of string * value
+  | None
 
 type row = value list
 type table
@@ -40,3 +41,5 @@ val pp_databases : database list -> unit
 val update : database -> unit
 val database_from_file : string -> database
 val remove_database : string -> unit
+val delete_from_table : string -> condition -> database -> database
+val delete_all_from_table : string -> database -> database

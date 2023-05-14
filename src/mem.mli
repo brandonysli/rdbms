@@ -1,5 +1,7 @@
 open Database
 
+type cond = Database.condition
+
 val select :
   string list -> string -> 'a -> 'b -> 'c -> string -> unit -> string
 
@@ -14,3 +16,4 @@ val create_database : string -> string -> unit
 val drop_database : string -> unit
 val list_databases : unit -> unit
 val is_database : string -> bool
+val delete_from_table : string -> cond -> bool -> string -> unit -> unit

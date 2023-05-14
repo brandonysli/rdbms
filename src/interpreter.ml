@@ -36,7 +36,18 @@ let interpret (s : stmt) (state : State.t) : State.t =
         (State.get_database state)
         ();
       state
-  | DELETE (table, cond) -> failwith "unimplemented"
+  | DELETE (table, cond) -> (
+      match cond with
+      | Some c ->
+          Mem.delete_from_table table (eval_cond c) true
+            (State.get_database state)
+            ();
+          state
+      | None ->
+          Mem.delete_from_table table None false
+            (State.get_database state)
+            ();
+          state)
   | UPDATE (table, updates, cond) -> failwith "unimplemented"
   | TCREATE (name, columns) ->
       Mem.add_table name

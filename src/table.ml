@@ -283,3 +283,6 @@ let delete_from_table f table =
     attributes = table.attributes;
     records = List.filter f table.records;
   }
+
+let delete_all_from_table table =
+  { attributes = table.attributes; records = [] }

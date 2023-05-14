@@ -1,5 +1,7 @@
 open Database
 
+type cond = Database.condition
+
 let get_database s = Database.database_from_file s
 
 let reset_database d =
@@ -32,6 +34,14 @@ let insert name col_list val_list d () =
 let add_table name col_list d () =
   let db = Database.add_table name col_list (get_database d) in
   update_database db
+
+let delete_from_table name cond has_cond d () =
+  if has_cond then
+    let db = Database.delete_from_table name cond (get_database d) in
+    update_database db
+  else
+    let db = Database.delete_all_from_table name (get_database d) in
+    update_database db
 
 let drop_table name d () =
   let db = Database.remove_table name (Database.database_from_file d) in
