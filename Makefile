@@ -1,4 +1,4 @@
-.PHONY: test check testparse
+.PHONY: test check testparse cloc
 
 build:
 	dune build
@@ -20,7 +20,6 @@ doc:
 
 clean:
 	dune clean
-	rm -f rml.zip
 
 opendoc: doc
 	@bash opendoc.sh
@@ -33,4 +32,8 @@ testparse:
 
 repl:
 	OCAMLRUNPARAM=b dune exec bin/repl.exe
+
+cloc:
+	-dune clean
+	cloc --by-file --include-lang=OCaml .
 
