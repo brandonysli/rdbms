@@ -72,12 +72,350 @@ let select_tests =
                    EQ (PAIR ("b3", "id"), PAIR ("b2", "id")) );
              ],
            Some (EQ (PAIR ("b", "id"), PAIR ("b2", "id"))) ));
+    parse_test
+      "Select with where clause and LT: SELECT a,b FROM Brandon WHERE \
+       a < 5;"
+      "SELECT a,b FROM Brandon WHERE a < 5;"
+      (SELECT
+         ( [ "a"; "b" ],
+           [ TBL ("Brandon", None) ],
+           None,
+           Some (LT (STR "a", INT 5)) ));
+    parse_test
+      "Select with where clause and GE: SELECT a,b FROM Brandon WHERE \
+       a >= 5;"
+      "SELECT a,b FROM Brandon WHERE a >= 5;"
+      (SELECT
+         ( [ "a"; "b" ],
+           [ TBL ("Brandon", None) ],
+           None,
+           Some (GE (STR "a", INT 5)) ));
+    parse_test
+      "Select with where clause and LE: SELECT a,b FROM Brandon WHERE \
+       a <= 5;"
+      "SELECT a,b FROM Brandon WHERE a <= 5;"
+      (SELECT
+         ( [ "a"; "b" ],
+           [ TBL ("Brandon", None) ],
+           None,
+           Some (LE (STR "a", INT 5)) ));
+    parse_test
+      "Select with where clause and NEQ: SELECT a,b FROM Brandon WHERE \
+       a != 5;"
+      "SELECT a,b FROM Brandon WHERE a != 5;"
+      (SELECT
+         ( [ "a"; "b" ],
+           [ TBL ("Brandon", None) ],
+           None,
+           Some (NEQ (STR "a", INT 5)) ));
+    parse_test
+      "Select with AND in where clause: SELECT a,b FROM Brandon WHERE \
+       a > 5 AND b < 10;"
+      "SELECT a,b FROM Brandon WHERE a > 5 AND b < 10;"
+      (SELECT
+         ( [ "a"; "b" ],
+           [ TBL ("Brandon", None) ],
+           None,
+           Some (AND (GT (STR "a", INT 5), LT (STR "b", INT 10))) ));
+    parse_test
+      "Select with OR in where clause: SELECT a,b FROM Brandon WHERE a \
+       > 5 OR b < 10;"
+      "SELECT a,b FROM Brandon WHERE a > 5 OR b < 10;"
+      (SELECT
+         ( [ "a"; "b" ],
+           [ TBL ("Brandon", None) ],
+           None,
+           Some (OR (GT (STR "a", INT 5), LT (STR "b", INT 10))) ));
+    parse_test
+      "Select with complex where clause: SELECT a,b FROM Brandon WHERE \
+       a > 5 AND b < 10 OR c = 3;"
+      "SELECT a,b FROM Brandon WHERE a > 5 AND b < 10 OR c = 3;"
+      (SELECT
+         ( [ "a"; "b" ],
+           [ TBL ("Brandon", None) ],
+           None,
+           Some
+             (AND
+                ( GT (STR "a", INT 5),
+                  OR (LT (STR "b", INT 10), EQ (STR "c", INT 3)) )) ));
+    parse_test
+      "Select with complex where clause (checking precedence): SELECT \
+       a,b FROM Brandon WHERE b < 10 OR c = 3 AND a > 5;"
+      "SELECT a,b FROM Brandon WHERE b < 10 OR c = 3 AND a > 5;"
+      (SELECT
+         ( [ "a"; "b" ],
+           [ TBL ("Brandon", None) ],
+           None,
+           Some
+             (AND
+                ( OR (LT (STR "b", INT 10), EQ (STR "c", INT 3)),
+                  GT (STR "a", INT 5) )) ));
+    parse_test
+      "Select with left join: SELECT a,b FROM Brandon LEFT JOIN \
+       Brandon2 ON Brandon.id = Brandon2.id;"
+      "SELECT a,b FROM Brandon LEFT JOIN Brandon2 ON Brandon.id = \
+       Brandon2.id;"
+      (SELECT
+         ( [ "a"; "b" ],
+           [ TBL ("Brandon", None) ],
+           Some
+             [
+               JOIN
+                 ( LEFT,
+                   TBL ("Brandon2", None),
+                   EQ (PAIR ("Brandon", "id"), PAIR ("Brandon2", "id"))
+                 );
+             ],
+           None ));
+    parse_test
+      "Select with right join: SELECT a,b FROM Brandon RIGHT JOIN \
+       Brandon2 ON Brandon.id = Brandon2.id;"
+      "SELECT a,b FROM Brandon RIGHT JOIN Brandon2 ON Brandon.id = \
+       Brandon2.id;"
+      (SELECT
+         ( [ "a"; "b" ],
+           [ TBL ("Brandon", None) ],
+           Some
+             [
+               JOIN
+                 ( RIGHT,
+                   TBL ("Brandon2", None),
+                   EQ (PAIR ("Brandon", "id"), PAIR ("Brandon2", "id"))
+                 );
+             ],
+           None ));
+    parse_test
+      "Select with full join: SELECT a,b FROM Brandon FULL JOIN \
+       Brandon2 ON Brandon.id = Brandon2.id;"
+      "SELECT a,b FROM Brandon FULL JOIN Brandon2 ON Brandon.id = \
+       Brandon2.id;"
+      (SELECT
+         ( [ "a"; "b" ],
+           [ TBL ("Brandon", None) ],
+           Some
+             [
+               JOIN
+                 ( FULL,
+                   TBL ("Brandon2", None),
+                   EQ (PAIR ("Brandon", "id"), PAIR ("Brandon2", "id"))
+                 );
+             ],
+           None ));
+    parse_test
+      "Select with inner join and where clause: SELECT a,b FROM \
+       Brandon INNER JOIN Brandon2 ON Brandon.id = Brandon2.id WHERE \
+       Brandon.id > 5;"
+      "SELECT a,b FROM Brandon INNER JOIN Brandon2 ON Brandon.id = \
+       Brandon2.id WHERE Brandon.id > 5;"
+      (SELECT
+         ( [ "a"; "b" ],
+           [ TBL ("Brandon", None) ],
+           Some
+             [
+               JOIN
+                 ( INNER,
+                   TBL ("Brandon2", None),
+                   EQ (PAIR ("Brandon", "id"), PAIR ("Brandon2", "id"))
+                 );
+             ],
+           Some (GT (PAIR ("Brandon", "id"), INT 5)) ));
+    parse_test
+      "Select with inner join and where clause: SELECT a,b,c FROM \
+       Brandon INNER JOIN Brandon2 ON Brandon.id = Brandon2.id WHERE \
+       Brandon.id > 5;"
+      "SELECT a,b,c FROM Brandon INNER JOIN Brandon2 ON Brandon.id = \
+       Brandon2.id WHERE Brandon.id > 5;"
+      (SELECT
+         ( [ "a"; "b"; "c" ],
+           [ TBL ("Brandon", None) ],
+           Some
+             [
+               JOIN
+                 ( INNER,
+                   TBL ("Brandon2", None),
+                   EQ (PAIR ("Brandon", "id"), PAIR ("Brandon2", "id"))
+                 );
+             ],
+           Some (GT (PAIR ("Brandon", "id"), INT 5)) ));
+  ]
+
+let update_tests =
+  [
+    parse_test "UPDATE Brandon SET a = 5;" "UPDATE Brandon SET a = 5;"
+      (UPDATE ("Brandon", [ ("a", INT 5) ], None));
+    parse_test "UPDATE Brandon SET a = 5, b = 10;"
+      "UPDATE Brandon SET a = 5, b = 10;"
+      (UPDATE ("Brandon", [ ("a", INT 5); ("b", INT 10) ], None));
+    parse_test "UPDATE Brandon SET a = 5 WHERE a = 10;"
+      "UPDATE Brandon SET a = 5 WHERE a = 10;"
+      (UPDATE ("Brandon", [ ("a", INT 5) ], Some (EQ (STR "a", INT 10))));
+    parse_test "UPDATE Brandon SET a = 5, b = 10 WHERE a = 10;"
+      "UPDATE Brandon SET a = 5, b = 10 WHERE a = 10;"
+      (UPDATE
+         ( "Brandon",
+           [ ("a", INT 5); ("b", INT 10) ],
+           Some (EQ (STR "a", INT 10)) ));
+    parse_test
+      "UPDATE Brandon SET a = 5, b = 10 WHERE a = 10 AND b = 5;"
+      "UPDATE Brandon SET a = 5, b = 10 WHERE a = 10 AND b = 5;"
+      (UPDATE
+         ( "Brandon",
+           [ ("a", INT 5); ("b", INT 10) ],
+           Some (AND (EQ (STR "a", INT 10), EQ (STR "b", INT 5))) ));
+    parse_test "UPDATE Brandon SET a = 5, b = 10 WHERE a = 10 OR b = 5;"
+      "UPDATE Brandon SET a = 5, b = 10 WHERE a = 10 OR b = 5;"
+      (UPDATE
+         ( "Brandon",
+           [ ("a", INT 5); ("b", INT 10) ],
+           Some (OR (EQ (STR "a", INT 10), EQ (STR "b", INT 5))) ));
+    parse_test
+      "UPDATE Brandon SET a = 5, b = 10 WHERE a = 10 AND b = 5 OR c = \
+       3;"
+      "UPDATE Brandon SET a = 5, b = 10 WHERE a = 10 AND b = 5 OR c = \
+       3;"
+      (UPDATE
+         ( "Brandon",
+           [ ("a", INT 5); ("b", INT 10) ],
+           Some
+             (OR
+                ( AND (EQ (STR "a", INT 10), EQ (STR "b", INT 5)),
+                  EQ (STR "c", INT 3) )) ));
+  ]
+
+let insert_tests =
+  [
+    parse_test "INSERT INTO Brandon (a,b) VALUES (5,10);"
+      "INSERT INTO Brandon (a,b) VALUES (5,10);"
+      (INSERT ("Brandon", [ "a"; "b" ], [ INT 5; INT 10 ]));
+    parse_test "INSERT INTO Brandon (a) VALUES (5);"
+      "INSERT INTO Brandon (a) VALUES (5);"
+      (INSERT ("Brandon", [ "a" ], [ INT 5 ]));
+    parse_test "INSERT INTO Brandon (a,b,c) VALUES (5,10,15);"
+      "INSERT INTO Brandon (a,b,c) VALUES (5,10,15);"
+      (INSERT ("Brandon", [ "a"; "b"; "c" ], [ INT 5; INT 10; INT 15 ]));
+    parse_test "INSERT INTO Brandon (a,b,c) VALUES (5.0,10.0,15.0);"
+      "INSERT INTO Brandon (a,b,c) VALUES (5.0,10.0,15.0);"
+      (INSERT
+         ( "Brandon",
+           [ "a"; "b"; "c" ],
+           [ FLOAT 5.0; FLOAT 10.0; FLOAT 15.0 ] ));
+    parse_test
+      "INSERT INTO Brandon (a,b,c) VALUES (\"5\",\"10\",\"15\");"
+      "INSERT INTO Brandon (a,b,c) VALUES (\"5\",\"10\",\"15\");"
+      (INSERT
+         ("Brandon", [ "a"; "b"; "c" ], [ STR "5"; STR "10"; STR "15" ]));
+    parse_test "INSERT INTO Brandon (id, name) VALUES (1, \"John\");"
+      "INSERT INTO Brandon (id, name) VALUES (1, \"John\");"
+      (INSERT ("Brandon", [ "id"; "name" ], [ INT 1; STR "John" ]));
+    parse_test
+      "INSERT INTO Brandon (id, name, age) VALUES (1, \"John\", 30);"
+      "INSERT INTO Brandon (id, name, age) VALUES (1, \"John\", 30);"
+      (INSERT
+         ( "Brandon",
+           [ "id"; "name"; "age" ],
+           [ INT 1; STR "John"; INT 30 ] ));
+  ]
+
+let delete_tests =
+  [
+    parse_test "DELETE FROM Brandon;" "DELETE FROM Brandon;"
+      (DELETE ("Brandon", None));
+    parse_test "DELETE FROM Brandon WHERE a = 5;"
+      "DELETE FROM Brandon WHERE a = 5;"
+      (DELETE ("Brandon", Some (EQ (STR "a", INT 5))));
+    parse_test "DELETE FROM Brandon WHERE a = 5 AND b = 10;"
+      "DELETE FROM Brandon WHERE a = 5 AND b = 10;"
+      (DELETE
+         ( "Brandon",
+           Some (AND (EQ (STR "a", INT 5), EQ (STR "b", INT 10))) ));
+    parse_test "DELETE FROM Brandon WHERE a = 5 OR b = 10;"
+      "DELETE FROM Brandon WHERE a = 5 OR b = 10;"
+      (DELETE
+         ( "Brandon",
+           Some (OR (EQ (STR "a", INT 5), EQ (STR "b", INT 10))) ));
+    parse_test "DELETE FROM Brandon WHERE a = 5 AND b = 10 OR c = 15;"
+      "DELETE FROM Brandon WHERE a = 5 AND b = 10 OR c = 15;"
+      (DELETE
+         ( "Brandon",
+           Some
+             (OR
+                ( AND (EQ (STR "a", INT 5), EQ (STR "b", INT 10)),
+                  EQ (STR "c", INT 15) )) ));
+    parse_test "DELETE FROM Brandon WHERE a = 5 OR b = 10 AND c = 15;"
+      "DELETE FROM Brandon WHERE a = 5 OR b = 10 AND c = 15;"
+      (DELETE
+         ( "Brandon",
+           Some
+             (OR
+                ( EQ (STR "a", INT 5),
+                  AND (EQ (STR "b", INT 10), EQ (STR "c", INT 15)) )) ));
+  ]
+
+let drop_table_tests =
+  [
+    parse_test "DROP TABLE Brandon;" "DROP TABLE Brandon;"
+      (TDROP "Brandon");
+    parse_test "DROP TABLE 2341242;" "DROP TABLE 2341242;"
+      (TDROP "2341242");
+    parse_test "DROP TABLE 23lk4j23k;" "DROP TABLE 23lk4j23k;"
+      (TDROP "23lk4j23k");
+    parse_test "DROP TABLE DFDFlkdjfsd;" "DROP TABLE DFDFlkdjfsd;"
+      (TDROP "DFDFlkdjfsd");
+    parse_test "DROP TABLE DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD;"
+      "DROP TABLE DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD;"
+      (TDROP "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
+  ]
+
+let drop_db_tests =
+  [
+    parse_test "DROP DATABASE Brandon;" "DROP DATABASE Brandon;"
+      (DDROP "Brandon");
+    parse_test "DROP DATABASE 2341242;" "DROP DATABASE 2341242;"
+      (DDROP "2341242");
+    parse_test "DROP DATABASE 23lk4j23k;" "DROP DATABASE 23lk4j23k;"
+      (DDROP "23lk4j23k");
+    parse_test "DROP DATABASE DFDFlkdjfsd;" "DROP DATABASE DFDFlkdjfsd;"
+      (DDROP "DFDFlkdjfsd");
+  ]
+
+let create_table_tests =
+  [
+    parse_test "CREATE TABLE Brandon (a INT);"
+      "CREATE TABLE Brandon (a INT);"
+      (TCREATE ("Brandon", [ ("a", INT 0) ]));
+    parse_test "CREATE TABLE Brandon (a INT, b FLOAT);"
+      "CREATE TABLE Brandon (a INT, b FLOAT);"
+      (TCREATE ("Brandon", [ ("a", INT 0); ("b", FLOAT 0.0) ]));
+    parse_test "CREATE TABLE TestDB (id INT, name STR);"
+      "CREATE TABLE TestDB (id INT, name STR);"
+      (TCREATE ("TestDB", [ ("id", INT 0); ("name", STR "") ]));
+    parse_test "CREATE TABLE TestDB2 (id INT, name STR, age INT);"
+      "CREATE TABLE TestDB2 (id INT, name STR, age INT);"
+      (TCREATE
+         ("TestDB2", [ ("id", INT 0); ("name", STR ""); ("age", INT 0) ]));
+    parse_test "CREATE TABLE TestDB3 (a FLOAT, b FLOAT, c FLOAT);"
+      "CREATE TABLE TestDB3 (a FLOAT, b FLOAT, c FLOAT);"
+      (TCREATE
+         ( "TestDB3",
+           [ ("a", FLOAT 0.0); ("b", FLOAT 0.0); ("c", FLOAT 0.0) ] ));
   ]
 
 let create_db_tests =
   [
-    parse_test "CREATE DATABASE Brandon;" "CREATE DATABASE Brandon;"
-      (DCREATE "Brandon");
+    parse_test "CREATE DATABASE TestDB1;" "CREATE DATABASE TestDB1;"
+      (DCREATE "TestDB1");
+    parse_test "CREATE DATABASE TestDB2;" "CREATE DATABASE TestDB2;"
+      (DCREATE "TestDB2");
+    parse_test "CREATE DATABASE TestDB3;" "CREATE DATABASE TestDB3;"
+      (DCREATE "TestDB3");
+    parse_test "CREATE DATABASE DB123;" "CREATE DATABASE DB123;"
+      (DCREATE "DB123");
+    parse_test "CREATE DATABASE my_db;" "CREATE DATABASE my_db;"
+      (DCREATE "my_db");
+    parse_test "CREATE DATABASE dbName;" "CREATE DATABASE dbName;"
+      (DCREATE "dbName");
+    parse_test "CREATE DATABASE db_test;" "CREATE DATABASE db_test;"
+      (DCREATE "db_test");
   ]
 
 let token_tests =

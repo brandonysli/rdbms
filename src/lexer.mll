@@ -17,7 +17,7 @@ rule token = parse
   | '>' { GT }
   | "<=" { LE }
   | ">=" { GE }
-  | "<>" { NEQ }
+  | "!=" { NEQ }
   | "and" | "AND" { AND }
   | "or" | "OR" { OR }
   | ";" { SC }
