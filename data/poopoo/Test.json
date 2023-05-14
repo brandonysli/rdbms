@@ -1,0 +1,16 @@
+{
+  "attributes": { "bools": false, "ints": 0 },
+  "records": [
+    { "ints": 12, "bools": false },
+    { "ints": 12, "bools": false },
+    { "ints": 12, "bools": false },
+    { "ints": 12, "bools": false },
+    { "ints": 12, "bools": false },
+    { "ints": 12, "bools": false },
+    { "ints": 12, "bools": false },
+    { "ints": 12, "bools": false },
+    { "ints": 12, "bools": false },
+    { "ints": 12, "bools": false },
+    { "ints": 12, "bools": false }
+  ]
+}

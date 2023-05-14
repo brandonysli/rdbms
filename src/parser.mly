@@ -24,6 +24,7 @@ prog:
 
 stmt:
   | SELECT column_list FROM STR SC { SELECT($2, $4, None, None, None, None) }
+  | SELECT column_list FROM STR AS ID SC { SELECT($2, $4, Some $6, None, None, None) }  
   | SELECT column_list FROM STR WHERE cond SC { SELECT($2, $4, None, Some $6, None, None) }
   | SELECT column_list FROM STR AS ID WHERE cond SC { SELECT($2, $4, Some $6, Some $8, None, None) } 
   | INSERT INTO STR LPAREN id_list RPAREN VALUES LPAREN expr_list RPAREN SC { INSERT($3, $5, $9) }

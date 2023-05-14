@@ -1,4 +1,4 @@
-.PHONY: test check
+.PHONY: test check testparse
 
 build:
 	dune build
@@ -26,3 +26,6 @@ opendoc: doc
 
 print:
 	OCAMLRUNPARAM=b dune exec demo/ms2.exe
+
+testparse:
+	OCAMLRUNPARAM=b dune exec testparse/main.exe
