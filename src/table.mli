@@ -101,3 +101,5 @@ val delete_from_table : (record -> bool) -> t -> t
 
 val delete_all_from_table : t -> t
 (** [read_json_file table f] deletes all records stored in table t*)
+
+val select_table : t -> string list -> t

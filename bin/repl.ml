@@ -16,6 +16,7 @@ let rec repl st () =
     print_string "> ";
     let line = read_line () in
     if line = "quit" then ()
+    else if line = "clear" then clear st
     else
       match parse line with
       | exception Failure _ -> not_database_handler line st
@@ -31,9 +32,10 @@ let rec repl st () =
       "You are not the owner of this database! Try another database!";
     not_database_handler (read_line ()) st)
   else (
-    print_string (State.get_database st ^ "> ");
+    print_string ("Database " ^ State.get_database st ^ "> ");
     let line = read_line () in
     if line = "quit" then ()
+    else if line = "clear" then clear st
     else
       match parse line with
       | exception Failure s ->
@@ -45,6 +47,16 @@ let rec repl st () =
           print_endline "Success!";
           repl new_st ())
 
+and clear st =
+  print_endline "Are you sure you want to clear all databases? (Y/N)";
+  match read_line () with
+  | "Y" ->
+      print_endline "clearing databases";
+      Mem.clear_databases ()
+  | _ ->
+      print_endline "failed to clear databases";
+      repl st ()
+
 and not_database_handler line st =
   let s = line in
   if s = "quit" then ()
@@ -54,6 +66,7 @@ and not_database_handler line st =
   else if line = "quit" then ()
   else (
     print_endline "That is not a valid database!";
+    print_endline "";
     repl st ())
 
 let main () =

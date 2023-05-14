@@ -22,9 +22,6 @@ let update_database d =
   reset_database d;
   Database.update d
 
-let select columns table _ _ _ d () =
-  Database.select columns table (get_database d)
-
 let insert name col_list val_list d () =
   let db =
     Database.insert_into_table name col_list val_list (get_database d)
@@ -64,12 +61,28 @@ let list_databases () =
     files;
   print_endline ""
 
-let is_database directory_name =
+let is_database database_name =
   let directory_path = "data" in
-  let full_path = Filename.concat directory_path directory_name in
+  let full_path = Filename.concat directory_path database_name in
   try
     let file_info = Unix.stat full_path in
     file_info.Unix.st_kind = Unix.S_DIR
   with
   | Unix.Unix_error (Unix.ENOENT, _, _) -> false
   | _ -> false
+
+let rec clear_databases () =
+  let dir = "data" in
+  let files = Sys.readdir dir in
+  Array.iter
+    (fun file -> if is_database file then drop_database file)
+    files
+
+let rec select_helper tables columns d =
+  match tables with
+  | head :: tail ->
+      select_from_table head columns (get_database d);
+      select_helper tail columns d
+  | [] -> ()
+
+let select tables columns d () = select_helper tables columns d

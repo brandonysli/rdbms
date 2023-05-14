@@ -26,10 +26,17 @@ let rec eval_cond (c : cond) : Database.condition =
   | NEQ (s, d) -> (
       match s with STR str -> NE (str, eval d) | _ -> failwith "?")
 
+let table_to_string table = match table with TBL (s, e) -> s
+
 let interpret (s : stmt) (state : State.t) : State.t =
   match s with
   | SELECT (col_list, table, join_table, join_cond) ->
-      failwith "unimplemented"
+      Mem.select
+        (List.map table_to_string table)
+        col_list
+        (State.get_database state)
+        ();
+      state
   | INSERT (table, col_list, val_list) ->
       Mem.insert table col_list
         (List.map eval val_list)

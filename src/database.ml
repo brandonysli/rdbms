@@ -146,19 +146,6 @@ let pp_table table d =
    Printf.printf formatting (List.fold_left (fun acc x -> acc ^ x ^ "|")
    "" (attributes table)) *)
 
-let rec select_helper table cols =
-  match cols with
-  | [] -> table
-  | head :: tail -> Table.delete_attr head (select_helper table cols)
-
-let select cols table d =
-  Table.pp
-    (select_helper
-       (match get_table table d with
-       | Some table -> table.attr
-       | None -> Table.empty)
-       cols)
-
 (* Function to parse a database into a directory of JSON files *)
 let rec update_helper tables d =
   match tables with
@@ -312,3 +299,9 @@ let delete_all_from_table name d =
             d.tables;
       }
   | None -> d
+
+let select_from_table name cols d =
+  match get_table name d with
+  | Some table ->
+      print_endline (Table.pp (select_table table.attr cols))
+  | None -> ()

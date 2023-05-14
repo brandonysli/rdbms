@@ -197,7 +197,6 @@ let pp_records
   loop "" ordered_recs
 
 let pp tbl =
-  print_endline "";
   let attrs = List.map (fun (x, _) -> x) tbl.attributes in
   let max = 120 in
   if List.length attrs > 0 then
@@ -286,3 +285,14 @@ let delete_from_table f table =
 
 let delete_all_from_table table =
   { attributes = table.attributes; records = [] }
+
+let select_table table cols =
+  let attributes =
+    List.filter (fun (s, d) -> List.mem s cols) table.attributes
+  in
+  let records =
+    List.map
+      (fun r -> List.filter (fun (s, d) -> List.mem s cols) r)
+      table.records
+  in
+  { attributes; records }

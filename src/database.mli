@@ -26,7 +26,6 @@ val get_database_name : database -> string
 val get_database_owner : database -> string
 val empty : database
 val make_database : string -> string -> database
-val select : string list -> string -> database -> string
 val get_table : string -> database -> table option
 val get_name : table -> string
 val add_table : string -> (string * value) list -> database -> database
@@ -43,3 +42,4 @@ val database_from_file : string -> database
 val remove_database : string -> unit
 val delete_from_table : string -> condition -> database -> database
 val delete_all_from_table : string -> database -> database
+val select_from_table : string -> string list -> database -> unit

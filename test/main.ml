@@ -27,10 +27,10 @@ let add_to_m =
     "db1" ()
 
 let db =
-  let _ = Database.make_database "poopoo" "edward" in
+  let _ = Database.make_database "database" "edward" in
   Mem.add_table "Test"
     [ ("bools", Bool false); ("ints", Int 0) ]
-    "poopoo" ()
+    "database" ()
 
 let db0 = Database.add_table "cock" [ ("hi", Int 1); ("bye", Int 0) ]
 let tbl1 = Table.make [ ("hi", Int 1); ("bye", Int 0) ]
@@ -40,8 +40,8 @@ let tbl2 =
     Database.empty
 
 let d1 =
-  Mem.insert "Test" [ "bools"; "ints" ] [ Bool false; Int 12 ] "poopoo"
-    ()
+  Mem.insert "Test" [ "bools"; "ints" ] [ Bool false; Int 12 ]
+    "database" ()
 
 let rec d2 i =
   match i with
@@ -54,20 +54,19 @@ let rec d2 i =
 let json_table =
   TableParse.parse (TableParse.from_file "data/table1.json")
 
-let selection_table = Database.select [ "a1"; "a2"; "a5" ] ""
 let print_table_test = [ pp_table_test "json" json_table ]
 let select_tests = [ pp_table_test "json" ]
 let pp_database_test name db = name >:: fun _ -> ignore ()
 
 let print_db =
   [
-    pp_database_test "empty table" "poopoo";
-    pp_database_test "table" "poopoo";
-    pp_database_test "table" "poopoo";
+    pp_database_test "empty table" "database";
+    pp_database_test "table" "database";
+    pp_database_test "table" "database";
     pp_database_test "table"
       (let a = d2 5 in
        a;
-       "poopoo");
+       "database");
   ]
 
 let print_again = [ pp_database_test "poo" ]
@@ -80,6 +79,7 @@ let print_tbl =
   ]
 
 let db_tests = [ pp_db_test "db123" [ db1; db2; db3 ] ]
+let testing_db = Database.make_database "testing" "edward"
 
 let json_test name file_name table : test =
   name >:: fun _ ->
