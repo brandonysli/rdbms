@@ -2,7 +2,39 @@ open Mem
 open Ast
 open State
 
-let eval (e : expr) : Database.value = failwith "unimplemented"
+let eval (e : expr) : Database.value =
+  match e with
+  | STR s -> String s
+  | INT i -> Int i
+  | FLOAT f -> Float f
+  | _ -> Null
+
+let rec eval_cond (c : cond) =
+  match c with
+  | EQ (e1, e2) -> eval e1 = eval e2
+  | NEQ (e1, e2) -> eval e1 <> eval e2
+  | LT (e1, e2) -> (
+      match (e1, e2) with
+      | INT i1, INT i2 -> i1 < i2
+      | FLOAT i1, FLOAT i2 -> i1 < i2
+      | _ -> failwith "How did we get here")
+  | GT (e1, e2) -> (
+      match (e1, e2) with
+      | INT i1, INT i2 -> i1 > i2
+      | FLOAT i1, FLOAT i2 -> i1 > i2
+      | _ -> failwith "How did we get here")
+  | LE (e1, e2) -> (
+      match (e1, e2) with
+      | INT i1, INT i2 -> i1 <= i2
+      | FLOAT i1, FLOAT i2 -> i1 <= i2
+      | _ -> failwith "How did we get here")
+  | GE (e1, e2) -> (
+      match (e1, e2) with
+      | INT i1, INT i2 -> i1 >= i2
+      | FLOAT i1, FLOAT i2 -> i1 >= i2
+      | _ -> failwith "How did we get here")
+  | AND (c1, c2) -> eval_cond c1 && eval_cond c2
+  | OR (c1, c2) -> eval_cond c1 || eval_cond c2
 
 let interpret (s : stmt) (state : State.t) =
   match s with

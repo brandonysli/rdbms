@@ -12,4 +12,3 @@ val add_table :
 val remove_table : string -> string -> unit -> unit
 val create_database : string -> string -> unit
 val drop_database : string -> unit
-val pp_mem : string -> string

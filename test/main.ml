@@ -10,9 +10,6 @@ open Ast
 let pp_db_test name databases =
   name >:: fun _ -> ignore (pp_databases databases)
 
-let pp_database_test name mem =
-  name >:: fun _ -> ignore (print_endline (pp_mem mem))
-
 let pp_table_test name table =
   name >:: fun _ -> ignore (print_endline (pp table))
 
@@ -60,6 +57,7 @@ let json_table =
 let selection_table = Database.select [ "a1"; "a2"; "a5" ] ""
 let print_table_test = [ pp_table_test "json" json_table ]
 let select_tests = [ pp_table_test "json" ]
+let pp_database_test name db = name >:: fun _ -> ignore ()
 
 let print_db =
   [

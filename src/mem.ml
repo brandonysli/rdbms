@@ -4,25 +4,21 @@ let get_database s = Database.database_from_file s
 
 let reset_database d =
   let files =
-    Sys.readdir (Filename.concat "data" d.db_name)
+    Sys.readdir (Filename.concat "data" (Database.get_database_name d))
     |> Array.to_list
     |> List.filter (fun s -> s <> "metadata.json")
   in
   List.iter
     (fun file ->
       Sys.remove
-        (Filename.concat (Filename.concat "data" d.db_name) file))
+        (Filename.concat
+           (Filename.concat "data" (Database.get_database_name d))
+           file))
     files
 
 let update_database d =
   reset_database d;
   Database.update d
-
-let pp_mem m =
-  let d = get_database m in
-  "\nTables in " ^ d.db_name ^ " | owned by " ^ d.db_owner ^ "\nName"
-  ^ "\n-----------------\n"
-  ^ String.concat "\n" (List.map Database.get_name d.tables)
 
 let select columns table _ _ _ d () =
   Database.select columns table (get_database d)

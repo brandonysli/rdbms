@@ -12,6 +12,10 @@ type value =
   | Bool of bool
   | Null
 
+type cond =
+  | And of cond * cond
+  | Or of cond * cond
+
 type row = value list
 
 type table = {
@@ -25,6 +29,8 @@ type database = {
   tables : table list;
 }
 
+let get_database_name d = d.db_name
+let get_database_tables d = d.tables
 let empty = { db_name = "Empty"; db_owner = "nobody"; tables = [] }
 
 let to_data (v : value) : Table.data =
@@ -245,3 +251,5 @@ let make_database name owner =
 
 let remove_database name =
   Sys.command ("rm -r " ^ Filename.concat "data" name) |> ignore
+
+let delete name cond d = failwith "unimplemented"
