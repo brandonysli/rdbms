@@ -21,8 +21,8 @@ let pp_table_in_database name table database =
 
 let pp_database name d = name >:: fun _ -> ignore (pp_database d)
 let db1 = Database.make_database "db1" "brandon"
-let db2 = { db_name = "db2"; db_owner = "edward"; tables = [] }
-let db3 = { db_name = "database3"; db_owner = "justin"; tables = [] }
+let db2 = Database.make_database "db2" "brandon"
+let db3 = Database.make_database "db3" "brandon"
 
 let add_to_m =
   Mem.add_table "Test"
@@ -48,11 +48,11 @@ let d1 =
 
 let rec d2 i =
   match i with
-  | 0 -> "poopoo"
+  | 0 -> ()
   | x ->
-      let _ = d2 (i - 1) in
-      d1;
-      "poopoo"
+      let a = d2 (i - 1) in
+      a;
+      d1
 
 let json_table =
   TableParse.parse (TableParse.from_file "data/table1.json")
@@ -64,9 +64,12 @@ let select_tests = [ pp_table_test "json" ]
 let print_db =
   [
     pp_database_test "empty table" "poopoo";
-    pp_database_test "table" "d";
-    pp_database_test "table" "d1";
-    pp_database_test "table" (d2 5);
+    pp_database_test "table" "poopoo";
+    pp_database_test "table" "poopoo";
+    pp_database_test "table"
+      (let a = d2 5 in
+       a;
+       "poopoo");
   ]
 
 let print_again = [ pp_database_test "poo" ]

@@ -9,4 +9,7 @@ val insert :
 val add_table :
   string -> (string * value) list -> string -> unit -> unit
 
+val remove_table : string -> string -> unit -> unit
+val create_database : string -> string -> unit
+val drop_database : string -> unit
 val pp_mem : string -> string

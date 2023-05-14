@@ -98,6 +98,13 @@ let insert_into_table name cols vals d =
         d.tables;
   }
 
+let remove_table name d =
+  {
+    db_name = d.db_name;
+    db_owner = d.db_owner;
+    tables = List.filter (fun t -> t.table_name <> name) d.tables;
+  }
+
 let rec db_name_list databases =
   match databases with
   | [] -> []
@@ -105,7 +112,9 @@ let rec db_name_list databases =
 
 let pp_table name d =
   print_endline ("Table: " ^ name);
-  print_endline (Table.pp (Option.get (get_table name d)).attr)
+  match get_table name d with
+  | Some t -> print_endline (Table.pp t.attr)
+  | None -> ()
 
 let pp_database d =
   Printf.printf "\n*List of Tables*";
@@ -122,7 +131,10 @@ let pp_databases databases =
     (db_name_list databases);
   print_endline ""
 
-let pp_table table d = Table.pp (Option.get (get_table table d)).attr
+let pp_table table d =
+  match get_table table d with
+  | Some t -> Table.pp t.attr
+  | None -> "Table does not Exist"
 
 (* let pp_table table = Printf.printf "\n*List of Tables*\n"; let rec
    pp_tables_aux n acc = if n = 0 then String.sub acc 0 (String.length
@@ -230,3 +242,6 @@ let make_database name owner =
   let db = { db_name = name; db_owner = owner; tables = [] } in
   make_database_dir db;
   db
+
+let remove_database name =
+  Sys.command ("rm -r " ^ Filename.concat "data" name) |> ignore
