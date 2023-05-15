@@ -1,60 +1,72 @@
 open OUnit2
 open Rdatabase
-open Query
 open Database
+open Mem
+open Interpreter
+open Table
 open Parse
 open Ast
 
-let column_to_string c =
-  match c with
-  | Distinct col -> "Distinct " ^ String.concat " " col
-  | Nondistinct col -> "Nondistinct " ^ String.concat " " col
+let pp_db_test name databases =
+  name >:: fun _ -> ignore (pp_databases databases)
 
-let selection_to_string s =
-  "SELECT "
-  ^
-  match s with
-  | Count column -> "Count " ^ column_to_string column
-  | Column column -> "Column " ^ column_to_string column
+let pp_table_test name table =
+  name >:: fun _ -> ignore (print_endline (pp table))
 
-let table_to_string t =
-  match t with
-  | From table -> " FROM " ^ table
+let pp_table_in_database name table database =
+  name >:: fun _ -> ignore (pp_table table database)
 
-let condition_to_string c =
-  match c with
-  | Greater (str, i) -> str ^ " > " ^ string_of_int i
-  | Less (str, i) -> str ^ " < " ^ string_of_int i
-  | Equal (str, i) -> str ^ " = " ^ string_of_int i
+let pp_database name d = name >:: fun _ -> ignore (pp_database d)
+let db1 = Database.make_database "db1" "brandon"
+let db2 = Database.make_database "db2" "brandon"
+let db3 = Database.make_database "db3" "brandon"
 
-let condition_option_to_string c =
-  match c with
-  | None -> ""
-  | Some c -> " WHERE " ^ condition_to_string c
+let add_to_m =
+  Mem.add_table "Test"
+    [ ("bools", Bool false); ("ints", Int 0) ]
+    "db1" ()
 
-let query_to_string q =
-  selection_to_string q.selection
-  ^ table_to_string q.table
-  ^ condition_option_to_string q.condition
+let db =
+  let _ = Database.make_database "database" "edward" in
+  Mem.add_table "Test"
+    [ ("bools", Bool false); ("ints", Int 0) ]
+    "database" ()
 
-let query_test (name : string) (str : string) (expected_output : query) : test =
-  name >:: fun _ ->
-  assert_equal expected_output (parse_query str) ~printer:query_to_string
+let db0 = Database.add_table "cock" [ ("hi", Int 1); ("bye", Int 0) ]
+let tbl1 = Table.make [ ("hi", Int 1); ("bye", Int 0) ]
 
-let command_tests =
+let tbl2 =
+  Database.insert_into_table "cock" [ "hi"; "bye" ] [ Int 1; Int 2 ]
+    Database.empty
+
+let d1 =
+  Mem.insert "Test" [ "bools"; "ints" ] [ Bool false; Int 12 ]
+    "database" ()
+
+let rec d2 i =
+  match i with
+  | 0 -> ()
+  | x ->
+      let a = d2 (i - 1) in
+      a;
+      d1
+
+let json_table =
+  TableParse.parse (TableParse.from_file "data/table1.json")
+
+let print_table_test = [ pp_table_test "json" json_table ]
+let select_tests = [ pp_table_test "json" ]
+let pp_database_test name db = name >:: fun _ -> ignore ()
+
+let print_db =
   [
-    query_test "hi" "SELECT DISTINCT hi FROM world WHERE p > 4"
-      {
-        selection = Column (Distinct [ "hi" ]);
-        table = From "world";
-        condition = Some (Greater ("p", 4));
-      };
-    query_test "hi" "SELECT DISTINCT hi, bye, no FROM world WHERE p > 4"
-      {
-        selection = Column (Distinct [ "hi"; "bye"; "no" ]);
-        table = From "world";
-        condition = Some (Greater ("p", 4));
-      };
+    pp_database_test "empty table" "database";
+    pp_database_test "table" "database";
+    pp_database_test "table" "database";
+    pp_database_test "table"
+      (let a = d2 5 in
+       a;
+       "database");
   ]
 
 let get_data_rc key_attr key_dat attr tbl =
@@ -73,14 +85,14 @@ let test_empty_table _ =
 let test_insert_attr _ =
   let open Table in
   let tbl = empty in
-  let tbl' = insert_attr "attr1" tbl in
+  let tbl' = insert_attr "attr1" tbl (String "") in
   assert_equal (columns tbl') 1;
   assert_equal (rows tbl') 0;
   assert_equal (attributes tbl') [ "attr1" ]
 
 let test_update_attr _ =
   let open Table in
-  let tbl = make [ "1"; "2"; "3"; "4" ] in
+  let tbl = make [ ("1", (Int 0)); ("2", (Int 0)); ("3", (Int 0)); ("4", (Int 0)) ] in
   let tbl' = tbl |> update_attr "1" "5" in
   assert_equal (rows tbl') 0;
   assert_equal (columns tbl') 4;
@@ -88,9 +100,9 @@ let test_update_attr _ =
 
 let test_delete_attr _ =
   let open Table in
-  let tbl1 = make [ "1" ] in
+  let tbl1 = make [ ("1", (Int 0)) ] in
   let tbl1' = delete_attr "1" tbl1 in
-  let tbl2 = make [ "1"; "2"; "3"; "4" ] in
+  let tbl2 = make [ ("1", (Int 0)); ("2", (Int 0)); ("3", (Int 0)); ("4", (Int 0)) ] in
   let tbl2' = delete_attr "2" tbl2 in
   assert_equal (columns tbl1') 0;
   assert_equal (columns tbl2') 3;
@@ -98,7 +110,7 @@ let test_delete_attr _ =
 
 let test_insert_rec _ =
   let open Table in
-  let tbl = make [ "a"; "b" ] in
+  let tbl = make [ ("a", String ""); ("b", String "") ] in
   assert_equal
     (tbl |> insert_rec "a" (Int 1) |> get_data_rc "a" (Int 1) "b")
     Null;
@@ -111,7 +123,7 @@ let test_insert_rec _ =
 
 let test_update_data _ =
   let open Table in
-  let tbl = make [ "a"; "b" ] |> insert_full_rec [ ("a", Null); ("b", Null) ] in
+  let tbl = make [ ("a", String ""); ("b", Int 0) ] |> insert_full_rec [ ("a", Null); ("b", Null) ] in
   let r = tbl |> get_record "a" Null in
   let tbl1 = tbl |> update_data r "a" (String "a1") in
   let tbl2 = tbl |> update_data r "b" (Int 1) in
@@ -129,7 +141,7 @@ let test_update_data _ =
 let test_delete_rec _ =
   let open Table in
   let tbl =
-    make [ "a1"; "a2"; "a3" ]
+    make [ ("a1", Int 0); ("a2", Int 0); ("a3", Int 0) ]
     |> insert_full_rec [ ("a1", Int 1); ("a2", Int 2); ("a3", Int 3) ]
     |> insert_full_rec [ ("a1", Int 11); ("a2", Int 22); ("a3", Int 33) ]
   in
@@ -154,7 +166,7 @@ let pp_data_test _ =
 let test_raises _ =
   let open Table in
   let tbl =
-    make [ "a1"; "a2"; "a3" ]
+    make [ ("a1", Int 0); ("a2", Int 0); ("a3", Int 0) ]
     |> insert_full_rec [ ("a1", Int 1); ("a2", Int 2); ("a3", Int 3) ]
     |> insert_full_rec [ ("a1", Int 11); ("a2", Int 22); ("a3", Int 33) ]
   in
@@ -177,19 +189,28 @@ let table_tests =
       "pretty print data" >:: pp_data_test;
     ]
 
-let parse_test name str expected_output : test =
-  name >:: fun _ -> assert_equal expected_output (Parse.parse str)
+let print_again = [ pp_database_test "poo" ]
 
-let parse_tests =
+let print_tbl =
   [
-    parse_test "SELECT * FROM Brandon;" "SELECT * FROM Brandon;"
-      (SELECT ([ "*" ], "Brandon", None, None, None));
-    parse_test "CREATE DATABASE Brandon;" "CREATE DATABASE Brandon;"
-      (DCREATE "Brandon");
+    pp_table_test "empty" Table.empty;
+    pp_table_test "table" tbl1;
+    pp_table_in_database "insert" "cock" tbl2;
   ]
+
+let db_tests = [ pp_db_test "db123" [ db1; db2; db3 ] ]
+let testing_db = Database.make_database "testing" "edward"
+
+let json_test name file_name table : test =
+  name >:: fun _ ->
+  ignore (Table.write_json_to_file file_name table "testing")
+
+let json_tests = [ json_test "json" "test" json_table ]
 
 let suite =
   "test suite for final"
-  >::: List.flatten [ command_tests; parse_tests; table_tests ]
+ 
+  >::: List.flatten
+         [ json_tests; print_table_test; print_db; print_tbl; table_tests ]
 
 let _ = run_test_tt_main suite

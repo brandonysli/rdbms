@@ -1,13 +1,16 @@
 %{
   open Ast
+  open List
 %}
 
 %token <int> INT
 %token <float> FLOAT
 %token <string> STR
-%token <string> ID
-%token LPAREN RPAREN COMMA STAR EQUALS LT GT LE GE NEQ AND OR SC
+%token <string> ID 
+%token <string * string> PAIR 
+%token LPAREN RPAREN COMMA STAR EQUALS LT GT LE GE NEQ AND OR SC AS 
 %token SELECT FROM INSERT INTO VALUES DELETE UPDATE CREATE TABLE DROP DATABASE SET WHERE
+%token INNER LEFT RIGHT FULL JOIN ON
 
 
 %left AND
@@ -21,8 +24,10 @@ prog:
   | stmt { $1 }
 
 stmt:
-  | SELECT column_list FROM ID SC { SELECT($2, $4, None, None, None) }
-  | SELECT column_list FROM ID WHERE cond SC { SELECT($2, $4, Some $6, None, None) }
+  | SELECT column_list FROM table_list SC { SELECT(rev $2, rev $4, None, None) }
+  | SELECT column_list FROM table_list WHERE cond SC { SELECT(rev $2, rev $4, None, Some $6) } 
+  | SELECT column_list FROM table_list join_list SC { SELECT(rev $2, rev $4, Some (rev $5), None) }
+  | SELECT column_list FROM table_list join_list WHERE cond SC { SELECT(rev $2, rev $4, Some (rev $5), Some $7) }
   | INSERT INTO ID LPAREN id_list RPAREN VALUES LPAREN expr_list RPAREN SC { INSERT($3, $5, $9) }
   | DELETE FROM ID SC { DELETE($3, None) }
   | UPDATE ID SET update_list SC { UPDATE($2, $4, None) }
@@ -34,6 +39,27 @@ stmt:
 column_list:
   | STAR { ["*"] }
   | id_list { $1 }
+
+table:
+  | ID { TBL($1, None) }
+  | ID AS ID { TBL($1, Some $3) }
+
+table_list:
+  | table { [$1] }
+  | table_list COMMA table { $3 :: $1 }
+
+join_type:
+  | INNER { INNER }
+  | LEFT { LEFT }
+  | RIGHT { RIGHT }
+  | FULL { FULL }
+
+join_list:
+  | join { [$1] }
+  | join_list join { $2 :: $1 }
+
+join:
+  | join_type JOIN table ON cond { JOIN($1, $3, $5) }
 
 id_type_list:
   | ID expr { [($1, $2)] }
@@ -51,7 +77,8 @@ expr:
   | INT { INT $1 }
   | FLOAT { FLOAT $1 }
   | STR { STR $1 }
-  | ID { COL $1 }
+  | PAIR { PAIR (fst $1, snd $1) }
+  | ID { STR $1 }
   | ID LPAREN expr_list RPAREN { FUN($1, $3) }
 
 cond:
