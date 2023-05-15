@@ -3,12 +3,13 @@
 type t
 (** Abstract type representing a table. *)
 
+(** Stores the data for each record-attribute pair. *)
 type data =
   | String of string
   | Int of int
   | Float of float
   | Bool of bool
-  | Null  (** Stores the data for each record-attribute pair. *)
+  | Null
 
 type record
 (** Stores data about a given entry in the table. *)
@@ -23,7 +24,7 @@ val make : (string * data) list -> t
 exception UnknownAttribute of string
 (** Raised when an attribute of the given name is not in the table. *)
 
-exception UnknownRecord of string
+exception UnknownRecord
 (** Raised when a record with the given value is not in the attribute. *)
 
 val insert_attr : string -> t -> data -> t
@@ -64,7 +65,8 @@ val delete_rec : record -> t -> t
 val get_record : string -> data -> t -> record
 (** [get_record attr dat tbl] gets the record that has data [dat] for
     attribute [attr]. Requires: All data for attribute [attr] in [tbl]
-    is unique. *)
+    is unique. Raises: [UnknownAttribute] if [attr] is not in [tbl].
+    [UnknownRecord] if no record of given value exist. *)
 
 val get_data : string -> record -> data
 (** [get_data attr r tbl] gets the data from the record [r] with
@@ -89,8 +91,8 @@ val pp : t -> string
 (** [pp tbl] return the table as a string. *)
 
 val write_json_to_file : string -> t -> string -> unit
-(** [write_json_to_file filename t database_name] writes a table into a
-    json file*)
+(** [write_json_to_file filename t database_name] writes a table [t]
+    into a json file [filename] in database [database_name]*)
 
 val read_json_file : string -> t
 (** [read_json_file filename] reads a json file into a table*)
