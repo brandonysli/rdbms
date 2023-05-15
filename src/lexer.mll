@@ -44,6 +44,7 @@ rule token = parse
   | "INT" | "int" { TINT }
   | "STR" | "str" { TSTR }
   | "FLOAT" | "float" { TFLOAT }
+  | "BOOL" | "bool" { TBOOL }
   | digit+ as i { INT(int_of_string i) }
   | digit+ '.' digit* as f { FLOAT(float_of_string f) }
   | '"' [^'"']* '"' as s { STR(String.sub s 1 (String.length s - 2)) }

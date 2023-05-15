@@ -8,7 +8,7 @@
 %token <string> STR
 %token <string> ID 
 %token <string * string> PAIR 
-%token TINT TFLOAT TSTR
+%token TINT TFLOAT TSTR TBOOL
 %token LPAREN RPAREN COMMA STAR EQUALS LT GT LE GE NEQ AND OR SC AS 
 %token SELECT FROM INSERT INTO VALUES DELETE UPDATE CREATE TABLE DROP DATABASE SET WHERE
 %token INNER LEFT RIGHT FULL JOIN ON
@@ -72,6 +72,7 @@ typ:
   | TINT { TINT }
   | TFLOAT { TFLOAT }
   | TSTR { TSTR }
+  | TBOOL { TBOOL }
 
 id_list:
   | ID { [$1] }

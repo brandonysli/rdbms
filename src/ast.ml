@@ -2,6 +2,7 @@ type typ =
   | TSTR
   | TINT
   | TFLOAT
+  | TBOOL
 
 type expr =
   | STR of string
