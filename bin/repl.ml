@@ -62,6 +62,7 @@ and not_database_handler line st =
   if s = "quit" then ()
   else if Mem.is_database s then
     let new_st = update_state s (get_owner st) in
+    let _ = Mem.print_tables (State.get_database new_st) () in
     repl new_st ()
   else if line = "quit" then ()
   else (

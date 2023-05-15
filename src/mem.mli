@@ -16,3 +16,4 @@ val is_database : string -> bool
 val delete_from_table : string -> cond -> bool -> string -> unit -> unit
 val clear_databases : unit -> unit
 val select : string list -> string list -> string -> unit -> unit
+val print_tables : string -> unit -> unit

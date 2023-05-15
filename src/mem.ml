@@ -86,3 +86,7 @@ let rec select_helper tables columns d =
   | [] -> ()
 
 let select tables columns d () = select_helper tables columns d
+
+let print_tables d () =
+  Database.pp_database (get_database d);
+  print_endline ""
