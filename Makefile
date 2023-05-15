@@ -20,6 +20,7 @@ doc:
 
 clean:
 	dune clean
+	rm -f final.zip
 
 opendoc: doc
 	@bash opendoc.sh
@@ -36,3 +37,13 @@ repl:
 cloc:
 	-dune clean
 	cloc --by-file --include-lang=OCaml .
+
+check: 
+	@bash check.sh
+
+finalcheck:
+	@bash check.sh final
+
+zip:
+	rm -f final.zip
+	zip -r final.zip . -x@exclude.lst

@@ -11,6 +11,9 @@
 # ocamlbuild working directory
 _build/
 
+# submission file
+final.zip
+
 # ocamlbuild targets
 *.byte
 *.native
