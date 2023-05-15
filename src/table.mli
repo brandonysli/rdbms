@@ -105,3 +105,5 @@ val delete_all_from_table : t -> t
 (** [read_json_file table f] deletes all records stored in table t*)
 
 val select_table : t -> string list -> t
+(** [select_table table colums] gets a subtable of [table] with columns
+    [columns]*)
