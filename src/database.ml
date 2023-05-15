@@ -121,7 +121,6 @@ let pp_table name d =
 
 let pp_database d =
   Printf.printf "\n*List of Tables*";
-  Printf.printf "%18s" "\nName";
   Printf.printf "\n-----------------\n";
   List.iter (fun t -> Printf.printf "%-17s\n" t.table_name) d.tables
 

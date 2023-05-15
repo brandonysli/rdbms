@@ -32,13 +32,14 @@ let rec repl st () =
       "You are not the owner of this database! Try another database!";
     not_database_handler (read_line ()) st)
   else (
-    print_string ("Database " ^ State.get_database st ^ "> ");
+    print_string ("Database <" ^ State.get_database st ^ ">: ");
     let line = read_line () in
     if line = "quit" then ()
     else if line = "clear" then clear st
     else
       match parse line with
       | exception Failure s ->
+          print_endline s;
           print_endline "Invalid SQL input!";
           repl st ()
       | _ ->
@@ -82,5 +83,3 @@ let main () =
   repl st ()
 
 let () = main ()
-
-let test_repl = 

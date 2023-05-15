@@ -7,89 +7,44 @@ open Table
 open Parse
 open Ast
 
-let pp_db_test name databases =
-  name >:: fun _ -> ignore (pp_databases databases)
+let get_database_name_test name d expected_value : test =
+  name >:: fun _ -> assert_equal expected_value (get_database_name d)
 
-let pp_table_test name table =
-  name >:: fun _ -> ignore (print_endline (pp table))
+let get_database_owner_test name d expected_value : test =
+  name >:: fun _ -> assert_equal expected_value (get_database_owner d)
 
-let pp_table_in_database name table database =
-  name >:: fun _ -> ignore (pp_table table database)
-
-let pp_database name d = name >:: fun _ -> ignore (pp_database d)
-let db1 = Database.make_database "db1" "brandon"
+let db1 = Database.make_database "db1" "edward"
 let db2 = Database.make_database "db2" "brandon"
-let db3 = Database.make_database "db3" "brandon"
+let db3 = Database.make_database "db3" "chris"
+let db4 = Database.make_database "db4" "justin"
 
-let add_to_m =
-  Mem.add_table "Test"
-    [ ("bools", Bool false); ("ints", Int 0) ]
-    "db1" ()
-
-let db =
-  let _ = Database.make_database "database" "edward" in
-  Mem.add_table "Test"
-    [ ("bools", Bool false); ("ints", Int 0) ]
-    "database" ()
-
-let db0 = Database.add_table "cock" [ ("hi", Int 1); ("bye", Int 0) ]
-let tbl1 = Table.make [ ("hi", Int 1); ("bye", Int 0) ]
-
-let tbl2 =
-  Database.insert_into_table "cock" [ "hi"; "bye" ] [ Int 1; Int 2 ]
-    Database.empty
-
-let d1 =
-  Mem.insert "Test" [ "bools"; "ints" ] [ Bool false; Int 12 ]
-    "database" ()
-
-let rec d2 i =
-  match i with
-  | 0 -> ()
-  | x ->
-      let a = d2 (i - 1) in
-      a;
-      d1
-
-let json_table =
-  TableParse.parse (TableParse.from_file "data/table1.json")
-
-let print_table_test = [ pp_table_test "json" json_table ]
-let select_tests = [ pp_table_test "json" ]
-let pp_database_test name db = name >:: fun _ -> ignore ()
-
-let print_db =
+let database_name_tests =
   [
-    pp_database_test "empty table" "database";
-    pp_database_test "table" "database";
-    pp_database_test "table" "database";
-    pp_database_test "table"
-      (let a = d2 5 in
-       a;
-       "database");
+    get_database_name_test "db1" db1 "db1";
+    get_database_name_test "db2" db2 "db2";
+    get_database_name_test "db3" db3 "db3";
+    get_database_name_test "db4" db4 "db4";
   ]
 
-let print_again = [ pp_database_test "poo" ]
-
-let print_tbl =
+let database_owner_tests =
   [
-    pp_table_test "empty" Table.empty;
-    pp_table_test "table" tbl1;
-    pp_table_in_database "insert" "cock" tbl2;
+    get_database_owner_test "edward" db1 "edward";
+    get_database_owner_test "brandon" db2 "brandon";
+    get_database_owner_test "chris" db3 "chris";
+    get_database_owner_test "justin" db4 "justin";
   ]
 
-let db_tests = [ pp_db_test "db123" [ db1; db2; db3 ] ]
-let testing_db = Database.make_database "testing" "edward"
+let database_add_table_test name table cols d expected_value : test =
+  name >:: fun _ -> assert_equal expected_value (add_table table cols d)
 
-let json_test name file_name table : test =
-  name >:: fun _ ->
-  ignore (Table.write_json_to_file file_name table "testing")
+let database_owner_tests =
+  [
+    database_add_table_test "edward" "table1"
+      [ ("attr1", Int 1); ("attr2", Bool false); ("attr3", Float 0.1) ];
+    database_add_table_test "brandon" db2 "brandon";
+    database_add_table_test "chris" db3 "chris";
+    database_add_table_test "justin" db4 "justin";
+  ]
 
-let json_tests = [ json_test "json" "test" json_table ]
-
-let suite =
-  "test suite for final"
-  >::: List.flatten
-         [ json_tests; print_table_test; print_db; print_tbl ]
-
+let suite = "test suite for final" >::: List.flatten []
 let _ = run_test_tt_main suite
