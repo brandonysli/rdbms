@@ -4,19 +4,14 @@
   check in the data/ directory for if the files are created and modified
   in the way that the functions are intended to. Mostly black box
   testing, just to check that the databases and tables are being written
-<<<<<<< Updated upstream
-  and read to and from files as they are supposed to be. [Table] tests
-  were made to be easily expandable without remaking tables for every
-  test. Every test function actually tests several different inputs (3-8
-  per test) while allowing OUnit to deal with raised exceptions. *)
-=======
   and read to and from files as they are supposed to be. Due to the
   nature of the project, it is very difficult to make concrete test
   cases and most testing was done through the repl and checking the json
   files. There is RNG involved with tests passing as sometimes the
   parallelisms wil try to get one function to read from a file that has
-  not been written to yet, causing an error*)
->>>>>>> Stashed changes
+  not been written to yet, causing an error. 
+  
+  [Table] tests were made to be easily expandable without remaking tables for every test. Every test function actually tests several different inputs (3-8 per test) while allowing OUnit to deal with raised exceptions. *)
 
 open OUnit2
 open Rdatabase
@@ -71,7 +66,6 @@ let database_add_table_tests =
     add_table_test "json_table" "json_table" json_table "db1";
   ]
 
-<<<<<<< Updated upstream
 let get_data_rc key_attr key_dat attr tbl =
   let open Table in
   tbl |> get_record key_attr key_dat |> get_data attr
@@ -212,7 +206,6 @@ let json_test name file_name table : test =
   ignore (Table.write_json_to_file file_name table "testing")
 
 let json_tests = [ json_test "json" "test" json_table ]
-=======
 let database_drop_table_test name table d : test =
   name >:: fun _ -> ignore (Mem.drop_table table d ())
 
@@ -224,7 +217,6 @@ let database_drop_table_tests =
 
 let list_databases_tests =
   [ ("print" >:: fun _ -> ignore (Mem.list_databases ())) ]
->>>>>>> Stashed changes
 
 let suite =
   "test suite for final"
@@ -233,13 +225,10 @@ let suite =
            database_name_tests;
            database_owner_tests;
            database_add_table_tests;
-<<<<<<< Updated upstream
            json_tests;
            table_tests;
-=======
            database_drop_table_tests;
            list_databases_tests;
->>>>>>> Stashed changes
          ]
 
 let _ = run_test_tt_main suite
