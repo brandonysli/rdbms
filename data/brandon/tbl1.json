@@ -1,4 +1,0 @@
-{
-  "attributes": { "val": "INT", "name": "STR", "id": "STR" },
-  "records": [ { "id": "1", "name": "brandon", "val": 100 } ]
-}
