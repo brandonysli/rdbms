@@ -7,4 +7,4 @@ let test_dir = "./test/"
 let parse_dat name = TableParse.(dat_dir ^ name |> from_file |> parse)
 let tbl1 = parse_dat "table1.json"
 let tbl2 = parse_dat "table2.json"
-let pp tbl = tbl |> Table.pp (Table.attributes tbl) |> print_string
+let pp tbl = tbl |> Table.pp |> print_string

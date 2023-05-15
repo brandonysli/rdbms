@@ -55,13 +55,12 @@ let add_table_test name file table database : test =
   name >:: fun _ ->
   ignore (Table.write_json_to_file file table database)
 
-let pp_database_test name db = name >:: fun _ -> ignore ()
-
 let database_add_table_tests =
   [
-    pp_database_test "empty table" "database";
-    pp_database_test "table" "database";
-    pp_database_test "table" "database";
+    (* database_add_table_test "table1" "table1"
+      [ ("attr1", Int 1); ("attr2", Bool false); ("attr3", Float 0.1) ]
+      "db1"; *)
+    add_table_test "json_table" "json_table" json_table "db1";
   ]
 
 let get_data_rc key_attr key_dat attr tbl =
@@ -197,7 +196,6 @@ let table_tests =
       "pretty print data" >:: pp_data_test;
     ]
 
-let print_again = [ pp_database_test "poo" ]
 let testing_db = Database.make_database "testing" "edward"
 
 let json_test name file_name table : test =
