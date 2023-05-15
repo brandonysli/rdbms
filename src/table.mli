@@ -89,8 +89,8 @@ val pp : t -> string
 (** [pp tbl] return the table as a string. *)
 
 val write_json_to_file : string -> t -> string -> unit
-(** [write_json_to_file filename t database_name] writes a table into a
-    json file*)
+(** [write_json_to_file filename t database_name] writes a table [t]
+    into a json file [filename] in database [database_name]*)
 
 val read_json_file : string -> t
 (** [read_json_file filename] reads a json file into a table*)

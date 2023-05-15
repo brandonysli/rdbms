@@ -66,7 +66,9 @@ let list_databases () =
   files
   |> List.map (fun s -> Filename.concat directory_path s)
   |> List.filter Sys.is_directory
-  |> List.map (fun s -> get_database (chop_data_prefix s))
+  |> List.map chop_data_prefix
+  |> List.sort compare
+  |> List.map (fun s -> get_database s)
   |> pp_databases
 
 let is_database database_name =
