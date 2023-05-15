@@ -1,3 +1,8 @@
+type typ =
+  | TSTR
+  | TINT
+  | TFLOAT
+
 type expr =
   | STR of string
   | INT of int
@@ -29,7 +34,7 @@ type stmt =
   | INSERT of string * string list * expr list
   | DELETE of string * cond option
   | UPDATE of string * (string * expr) list * cond option
-  | TCREATE of string * (string * expr) list
+  | TCREATE of string * (string * typ) list
   | TDROP of string
   | DCREATE of string
   | DDROP of string
