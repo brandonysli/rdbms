@@ -9,7 +9,7 @@ type data =
   | Float of float
   | Bool of bool
   | Null
-      (** The type of data that can be stored in each cell of the table. *)
+(** The type of data that can be stored in each cell of the table. *)
 
 type record
 (** The type of records, which represent an entry in the table. *)
