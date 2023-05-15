@@ -290,6 +290,10 @@ let delete_all_from_table name d =
 let select_from_table name cols d =
   match get_table name d with
   | Some table ->
+      let cols = match cols with 
+      | "*" :: [] -> Table.attributes table.attr (* wildcard *)
+      | _ -> cols 
+      in
       print_endline (Table.pp (select_table table.attr cols))
   | None -> ()
 
