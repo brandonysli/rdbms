@@ -20,7 +20,7 @@ let debug = false
 (* RI: All records have the same number of attributes and all record
    attributes are the same. All attributes are unique.*)
 
-(** [rep_ok tbl] checks that the RI holds for [tbl]. *)
+(* [rep_ok tbl] checks that the RI holds for [tbl]. *)
 let rec rep_ok (tbl : t) =
   if debug then
     let rep_ok_record r =
@@ -39,7 +39,7 @@ let rec rep_ok (tbl : t) =
     tbl
   else tbl
 
-(* (** Production RI checker. *) let rep_ok = Fun.id *)
+(* (* Production RI checker. *) let rep_ok = Fun.id *)
 
 let empty : t = { attributes = []; records = [] } |> rep_ok
 let make attrs : t = { attributes = attrs; records = [] } |> rep_ok
