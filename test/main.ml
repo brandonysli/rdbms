@@ -57,9 +57,9 @@ let add_table_test name file table database : test =
 
 let database_add_table_tests =
   [
-    (* database_add_table_test "table1" "table1"
+    database_add_table_test "table1" "table1"
       [ ("attr1", Int 1); ("attr2", Bool false); ("attr3", Float 0.1) ]
-      "db1"; *)
+      "db1";
     add_table_test "json_table" "json_table" json_table "db1";
   ]
 
