@@ -40,18 +40,6 @@ let to_data (v : value) : Table.data =
 
 let get_name t = t.table_name
 
-let add_table name cols d =
-  {
-    db_name = d.db_name;
-    db_owner = d.db_owner;
-    tables =
-      {
-        table_name = name;
-        attr = Table.make (List.map (fun (x, y) -> (x, to_data y)) cols);
-      }
-      :: d.tables;
-  }
-
 let rec get_table_helper name table_list =
   match table_list with
   | [] -> None
@@ -121,7 +109,6 @@ let pp_table name d =
 
 let pp_database d =
   Printf.printf "\n*List of Tables*";
-  Printf.printf "%18s" "\nName";
   Printf.printf "\n-----------------\n";
   List.iter (fun t -> Printf.printf "%-17s\n" t.table_name) d.tables
 
@@ -305,3 +292,15 @@ let select_from_table name cols d =
   | Some table ->
       print_endline (Table.pp (select_table table.attr cols))
   | None -> ()
+
+let add_table name cols d =
+  {
+    db_name = d.db_name;
+    db_owner = d.db_owner;
+    tables =
+      {
+        table_name = name;
+        attr = Table.make (List.map (fun (x, y) -> (x, to_data y)) cols);
+      }
+      :: d.tables;
+  }

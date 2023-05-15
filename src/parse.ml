@@ -41,6 +41,9 @@ let string_of_token (token : token) =
   | RIGHT -> "OUTER"
   | LEFT -> "LEFT"
   | FULL -> "FULL"
+  | TINT -> "TINT"
+  | TSTR -> "TSTR"
+  | TFLOAT -> "TFLOAT"
 
 let parse s =
   let lexbuf = Lexing.from_string s in

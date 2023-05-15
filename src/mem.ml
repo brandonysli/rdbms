@@ -50,16 +50,26 @@ let create_database name owner =
 
 let drop_database name = Database.remove_database name
 
+let chop_data_prefix path =
+  let prefix = "data/" in
+  let prefix_length = String.length prefix in
+  if
+    String.length path >= prefix_length
+    && String.sub path 0 prefix_length = prefix
+  then String.sub path prefix_length (String.length path - prefix_length)
+  else path
+
 let list_databases () =
   print_endline "Databases: \n";
   let directory_path = "data" in
-  let files = Sys.readdir directory_path in
-  Array.iter
-    (fun file ->
-      let file_path = Filename.concat directory_path file in
-      if Sys.is_directory file_path then Printf.printf "%s/\n" file)
-    files;
-  print_endline ""
+  let files = Array.to_list (Sys.readdir directory_path) in
+  files
+  |> List.map (fun s -> Filename.concat directory_path s)
+  |> List.filter Sys.is_directory
+  |> List.map chop_data_prefix
+  |> List.sort compare
+  |> List.map (fun s -> get_database s)
+  |> pp_databases
 
 let is_database database_name =
   let directory_path = "data" in
@@ -86,3 +96,7 @@ let rec select_helper tables columns d =
   | [] -> ()
 
 let select tables columns d () = select_helper tables columns d
+
+let print_tables d () =
+  Database.pp_database (get_database d);
+  print_endline ""

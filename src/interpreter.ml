@@ -57,11 +57,9 @@ let interpret (s : stmt) (state : State.t) : State.t =
           state)
   | UPDATE (table, updates, cond) -> failwith "unimplemented"
   | TCREATE (name, columns) ->
-      Mem.add_table name
-        (List.map (fun (s, x) -> (s, eval x)) columns)
-        (State.get_database state)
-        ();
-      state
+      failwith "unimplemented"
+      (* Mem.add_table name (List.map (fun (s, x) -> (s, x)) columns)
+         (State.get_database state) (); state *)
   | TDROP name ->
       Mem.drop_table name (State.get_database state) ();
       state

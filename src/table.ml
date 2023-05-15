@@ -230,9 +230,20 @@ let data_of_json json =
   | `Null -> Null
   | _ -> failwith "Invalid data value"
 
-let record_to_json record =
+let find key list =
+  let rec find_index index = function
+    | [] -> raise Not_found
+    | (k, _) :: xs ->
+        if k = key then index else find_index (index + 1) xs
+  in
+  find_index 0 list
+
+let record_to_json attrs record =
   `Assoc
-    (List.map (fun (key, value) -> (key, data_to_json value)) record)
+    (List.sort
+       (fun (key1, _) (key2, _) ->
+         compare (find key1 attrs) (find key2 attrs))
+       (List.map (fun (key, value) -> (key, data_to_json value)) record))
 
 let t_to_json t =
   let attributes_json =
@@ -241,7 +252,9 @@ let t_to_json t =
          (fun (key, value) -> (key, data_to_json value))
          t.attributes)
   in
-  let records_json = `List (List.map record_to_json t.records) in
+  let records_json =
+    `List (List.map (record_to_json t.attributes) t.records)
+  in
   `Assoc [ ("attributes", attributes_json); ("records", records_json) ]
 
 let make_pretty t = pretty_to_string t
