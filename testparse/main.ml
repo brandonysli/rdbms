@@ -237,6 +237,27 @@ let select_tests =
                  );
              ],
            Some (GT (PAIR ("Brandon", "id"), INT 5)) ));
+    parse_test
+      "Select all with join and 2 aliases and 2 inner joins and where \
+       clause"
+      "SELECT * FROM Brandon as b, Brandon2 as b2 INNER JOIN Brandon3 \
+       as b3 ON b3.id = b2.id INNER JOIN Brandon4 as b4 ON b4.id = \
+       b2.id WHERE b.id = b2.id;"
+      (SELECT
+         ( [ "*" ],
+           [ TBL ("Brandon", Some "b"); TBL ("Brandon2", Some "b2") ],
+           Some
+             [
+               JOIN
+                 ( INNER,
+                   TBL ("Brandon3", Some "b3"),
+                   EQ (PAIR ("b3", "id"), PAIR ("b2", "id")) );
+               JOIN
+                 ( INNER,
+                   TBL ("Brandon4", Some "b4"),
+                   EQ (PAIR ("b4", "id"), PAIR ("b2", "id")) );
+             ],
+           Some (EQ (PAIR ("b", "id"), PAIR ("b2", "id"))) ));
   ]
 
 let update_tests =
@@ -277,9 +298,9 @@ let update_tests =
          ( "Brandon",
            [ ("a", INT 5); ("b", INT 10) ],
            Some
-             (OR
-                ( AND (EQ (STR "a", INT 10), EQ (STR "b", INT 5)),
-                  EQ (STR "c", INT 3) )) ));
+             (AND
+                ( EQ (STR "a", INT 10),
+                  OR (EQ (STR "b", INT 5), EQ (STR "c", INT 3)) )) ));
   ]
 
 let insert_tests =
@@ -338,27 +359,25 @@ let delete_tests =
       (DELETE
          ( "Brandon",
            Some
-             (OR
-                ( AND (EQ (STR "a", INT 5), EQ (STR "b", INT 10)),
-                  EQ (STR "c", INT 15) )) ));
+             (AND
+                ( EQ (STR "a", INT 5),
+                  OR (EQ (STR "b", INT 10), EQ (STR "c", INT 15)) )) ));
     parse_test "DELETE FROM Brandon WHERE a = 5 OR b = 10 AND c = 15;"
       "DELETE FROM Brandon WHERE a = 5 OR b = 10 AND c = 15;"
       (DELETE
          ( "Brandon",
            Some
-             (OR
-                ( EQ (STR "a", INT 5),
-                  AND (EQ (STR "b", INT 10), EQ (STR "c", INT 15)) )) ));
+             (AND
+                ( OR (EQ (STR "a", INT 5), EQ (STR "b", INT 10)),
+                  EQ (STR "c", INT 15) )) ));
   ]
 
 let drop_table_tests =
   [
     parse_test "DROP TABLE Brandon;" "DROP TABLE Brandon;"
       (TDROP "Brandon");
-    parse_test "DROP TABLE 2341242;" "DROP TABLE 2341242;"
-      (TDROP "2341242");
-    parse_test "DROP TABLE 23lk4j23k;" "DROP TABLE 23lk4j23k;"
-      (TDROP "23lk4j23k");
+    parse_test "DROP TABLE 23lk4j23k;" "DROP TABLE asdfasdf;"
+      (TDROP "asdfasdf");
     parse_test "DROP TABLE DFDFlkdjfsd;" "DROP TABLE DFDFlkdjfsd;"
       (TDROP "DFDFlkdjfsd");
     parse_test "DROP TABLE DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD;"
@@ -370,10 +389,8 @@ let drop_db_tests =
   [
     parse_test "DROP DATABASE Brandon;" "DROP DATABASE Brandon;"
       (DDROP "Brandon");
-    parse_test "DROP DATABASE 2341242;" "DROP DATABASE 2341242;"
-      (DDROP "2341242");
-    parse_test "DROP DATABASE 23lk4j23k;" "DROP DATABASE 23lk4j23k;"
-      (DDROP "23lk4j23k");
+    parse_test "DROP DATABASE asdfasdf;" "DROP DATABASE asdfasdf;"
+      (DDROP "asdfasdf");
     parse_test "DROP DATABASE DFDFlkdjfsd;" "DROP DATABASE DFDFlkdjfsd;"
       (DDROP "DFDFlkdjfsd");
   ]
@@ -382,22 +399,21 @@ let create_table_tests =
   [
     parse_test "CREATE TABLE Brandon (a INT);"
       "CREATE TABLE Brandon (a INT);"
-      (TCREATE ("Brandon", [ ("a", INT 0) ]));
+      (TCREATE ("Brandon", [ ("a", TINT) ]));
     parse_test "CREATE TABLE Brandon (a INT, b FLOAT);"
       "CREATE TABLE Brandon (a INT, b FLOAT);"
-      (TCREATE ("Brandon", [ ("a", INT 0); ("b", FLOAT 0.0) ]));
+      (TCREATE ("Brandon", [ ("a", TINT); ("b", TFLOAT) ]));
     parse_test "CREATE TABLE TestDB (id INT, name STR);"
       "CREATE TABLE TestDB (id INT, name STR);"
-      (TCREATE ("TestDB", [ ("id", INT 0); ("name", STR "") ]));
+      (TCREATE ("TestDB", [ ("id", TINT); ("name", TSTR) ]));
     parse_test "CREATE TABLE TestDB2 (id INT, name STR, age INT);"
       "CREATE TABLE TestDB2 (id INT, name STR, age INT);"
       (TCREATE
-         ("TestDB2", [ ("id", INT 0); ("name", STR ""); ("age", INT 0) ]));
+         ("TestDB2", [ ("id", TINT); ("name", TSTR); ("age", TINT) ]));
     parse_test "CREATE TABLE TestDB3 (a FLOAT, b FLOAT, c FLOAT);"
       "CREATE TABLE TestDB3 (a FLOAT, b FLOAT, c FLOAT);"
       (TCREATE
-         ( "TestDB3",
-           [ ("a", FLOAT 0.0); ("b", FLOAT 0.0); ("c", FLOAT 0.0) ] ));
+         ("TestDB3", [ ("a", TFLOAT); ("b", TFLOAT); ("c", TFLOAT) ]));
   ]
 
 let create_db_tests =
@@ -441,6 +457,18 @@ let token_tests =
   ]
 
 let suite =
-  "parse test suite" >::: List.flatten [ select_tests; token_tests ]
+  "parse test suite"
+  >::: List.flatten
+         [
+           select_tests;
+           update_tests;
+           insert_tests;
+           delete_tests;
+           drop_table_tests;
+           drop_db_tests;
+           create_db_tests;
+           create_table_tests;
+           token_tests;
+         ]
 
 let _ = run_test_tt_main suite

@@ -63,10 +63,10 @@ val delete_rec : record -> t -> t
     [UnknownRecord] if [r] is not a record in [tbl]. *)
 
 val get_record : string -> data -> t -> record
-(** [get_record attr dat tbl] gets the record that has data [dat] for attribute
-    [attr]. Requires: All data for attribute [attr] in [tbl] is unique. Raises:
-    [UnknownAttribute] if [attr] is not in [tbl]. [UnknownRecord] if no record
-    of given value exist. *)
+(** [get_record attr dat tbl] gets the record that has data [dat] for
+    attribute [attr]. Requires: All data for attribute [attr] in [tbl]
+    is unique. Raises: [UnknownAttribute] if [attr] is not in [tbl].
+    [UnknownRecord] if no record of given value exist. *)
 
 val get_data : string -> record -> data
 (** [get_data attr r tbl] gets the data from the record [r] with
@@ -91,8 +91,8 @@ val pp : t -> string
 (** [pp tbl] return the table as a string. *)
 
 val write_json_to_file : string -> t -> string -> unit
-(** [write_json_to_file filename t database_name] writes a table into a
-    json file*)
+(** [write_json_to_file filename t database_name] writes a table [t]
+    into a json file [filename] in database [database_name]*)
 
 val read_json_file : string -> t
 (** [read_json_file filename] reads a json file into a table*)

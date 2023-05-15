@@ -8,6 +8,7 @@
 %token <string> STR
 %token <string> ID 
 %token <string * string> PAIR 
+%token TINT TFLOAT TSTR
 %token LPAREN RPAREN COMMA STAR EQUALS LT GT LE GE NEQ AND OR SC AS 
 %token SELECT FROM INSERT INTO VALUES DELETE UPDATE CREATE TABLE DROP DATABASE SET WHERE
 %token INNER LEFT RIGHT FULL JOIN ON
@@ -28,10 +29,12 @@ stmt:
   | SELECT column_list FROM table_list WHERE cond SC { SELECT(rev $2, rev $4, None, Some $6) } 
   | SELECT column_list FROM table_list join_list SC { SELECT(rev $2, rev $4, Some (rev $5), None) }
   | SELECT column_list FROM table_list join_list WHERE cond SC { SELECT(rev $2, rev $4, Some (rev $5), Some $7) }
-  | INSERT INTO ID LPAREN id_list RPAREN VALUES LPAREN expr_list RPAREN SC { INSERT($3, $5, $9) }
+  | INSERT INTO ID LPAREN id_list RPAREN VALUES LPAREN expr_list RPAREN SC { INSERT($3, rev $5, rev $9) }
   | DELETE FROM ID SC { DELETE($3, None) }
-  | UPDATE ID SET update_list SC { UPDATE($2, $4, None) }
-  | CREATE TABLE ID LPAREN id_type_list RPAREN SC { TCREATE($3, $5) }
+  | DELETE FROM ID WHERE cond SC { DELETE($3, Some $5) }
+  | UPDATE ID SET update_list SC { UPDATE($2, rev $4, None) }
+  | UPDATE ID SET update_list WHERE cond SC { UPDATE($2, rev $4, Some $6) }
+  | CREATE TABLE ID LPAREN id_type_list RPAREN SC { TCREATE($3, rev $5) }
   | DROP TABLE ID SC { TDROP($3) }
   | CREATE DATABASE ID SC { DCREATE($3) }
   | DROP DATABASE ID SC { DDROP($3) }
@@ -62,8 +65,13 @@ join:
   | join_type JOIN table ON cond { JOIN($1, $3, $5) }
 
 id_type_list:
-  | ID expr { [($1, $2)] }
-  | id_type_list COMMA ID expr { ($3, $4) :: $1 }
+  | ID typ { [($1, $2)] }
+  | id_type_list COMMA ID typ { ($3, $4) :: $1 }
+
+typ:
+  | TINT { TINT }
+  | TFLOAT { TFLOAT }
+  | TSTR { TSTR }
 
 id_list:
   | ID { [$1] }
