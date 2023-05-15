@@ -82,3 +82,5 @@ let main () =
   repl st ()
 
 let () = main ()
+
+let test_repl = 
