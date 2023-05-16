@@ -9,10 +9,15 @@
   test. Every test function actually tests several different inputs (3-8
   per test) while allowing OUnit to deal with raised exceptions.Due to
   the nature of the project, it is very difficult to make concrete test
+  and read to and from files as they are supposed to be. Due to the
+  nature of the project, it is very difficult to make concrete test
   cases and most testing was done through the repl and checking the json
   files. There is RNG involved with tests passing as sometimes the
   parallelisms wil try to get one function to read from a file that has
-  not been written to yet, causing an error*)
+  not been written to yet, causing an error. [Table] tests were made to
+  be easily expandable without remaking tables for every test. Every
+  test function actually tests several different inputs (3-8 per test)
+  while allowing OUnit to deal with raised exceptions. *)
 
 open OUnit2
 open Rdatabase
